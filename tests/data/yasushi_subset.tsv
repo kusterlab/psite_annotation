@@ -1,0 +1,100 @@
+Type	Kinase	Uniprot ID	Protein description	Position	SIDIC	PTMscore	UniprotId	UniprotId_Site
+TK	ABL1	1433B_HUMAN	14-3-3 protein beta/alpha	S212	1	1	P31946	P31946_S212
+TK	ABL1	1433B_HUMAN	14-3-3 protein beta/alpha	Y151	1	1	P31946	P31946_Y151
+TK	ABL1	1433B_HUMAN	14-3-3 protein beta/alpha	Y21	1	1	P31946	P31946_Y21
+TK	ABL1	1433B_HUMAN	14-3-3 protein beta/alpha	Y50	1	1	P31946	P31946_Y50
+TK	ABL1	1433E_HUMAN	14-3-3 protein epsilon	Y152	1	1	P62258	P62258_Y152
+TK	ABL1	1433E_HUMAN	14-3-3 protein epsilon	Y20	1	1	P62258	P62258_Y20
+TK	ABL1	1433E_HUMAN	14-3-3 protein epsilon	Y49	1	1	P62258	P62258_Y49
+TK	ABL1	1433F_HUMAN	14-3-3 protein eta	S215	1		Q04917	Q04917_S215
+TK	ABL1	1433F_HUMAN	14-3-3 protein eta	Y154	1	1	Q04917	Q04917_Y154
+TK	ABL1	1433F_HUMAN	14-3-3 protein eta	Y20	1	1	Q04917	Q04917_Y20
+TK	ABL1	1433F_HUMAN	14-3-3 protein eta	Y49	1	1	Q04917	Q04917_Y49
+TK	ABL1	1433G_HUMAN	14-3-3 protein gamma	S215	1	1	P61981	P61981_S215
+TK	ABL1	1433G_HUMAN	14-3-3 protein gamma	Y20	1	1	P61981	P61981_Y20
+TK	ABL1	1433G_HUMAN	14-3-3 protein gamma	Y216	1		P61981	P61981_Y216
+TK	ABL1	1433G_HUMAN	14-3-3 protein gamma	Y49	1	1	P61981	P61981_Y49
+TK	ABL1	1433S_HUMAN	14-3-3 protein sigma	S149	1		P31947	P31947_S149
+TK	ABL1	1433S_HUMAN	14-3-3 protein sigma	Y151	1	1	P31947	P31947_Y151
+TK	ABL1	1433S_HUMAN	14-3-3 protein sigma	Y19	1	1	P31947	P31947_Y19
+TK	ABL1	1433S_HUMAN	14-3-3 protein sigma	Y213	1		P31947	P31947_Y213
+TK	ABL1	1433S_HUMAN	14-3-3 protein sigma	Y48	1	1	P31947	P31947_Y48
+TK	ABL1	1433T_HUMAN	14-3-3 protein theta	Y149	1	1	P27348	P27348_Y149
+TK	ABL1	1433T_HUMAN	14-3-3 protein theta	Y19	1	1	P27348	P27348_Y19
+TK	ABL1	1433T_HUMAN	14-3-3 protein theta	Y211		1	P27348	P27348_Y211
+TK	ABL1	1433T_HUMAN	14-3-3 protein theta	Y48	1	1	P27348	P27348_Y48
+TK	ABL1	1433Z_HUMAN	14-3-3 protein zeta/delta	Y149	1	1	P63104	P63104_Y149
+TK	ABL1	1433Z_HUMAN	14-3-3 protein zeta/delta	Y19	1	1	P63104	P63104_Y19
+TK	ABL1	1433Z_HUMAN	14-3-3 protein zeta/delta	Y211	1		P63104	P63104_Y211
+TK	ABL1	1433Z_HUMAN	14-3-3 protein zeta/delta	Y48	1	1	P63104	P63104_Y48
+TK	ABL1	1A25_HUMAN	HLA class I histocompatibility antigen, A-25 alpha chain	Y83	1	1	P04439	P04439_Y83
+TK	ABL1	1A26_HUMAN	HLA class I histocompatibility antigen, A-26 alpha chain	Y83	1	1	P04439	P04439_Y83
+TK	ABL1	1A33_HUMAN	HLA class I histocompatibility antigen, A-33 alpha chain	Y83	1	1	P04439	P04439_Y83
+TK	ABL1	1A34_HUMAN	HLA class I histocompatibility antigen, A-34 alpha chain	Y83	1	1	P04439	P04439_Y83
+TK	ABL1	1A66_HUMAN	HLA class I histocompatibility antigen, A-66 alpha chain	Y83	1	1	P04439	P04439_Y83
+TK	ABL1	1A68_HUMAN	HLA class I histocompatibility antigen, A-68 alpha chain	Y83	1	1	P04439	P04439_Y83
+TK	ABL1	1A69_HUMAN	HLA class I histocompatibility antigen, A-69 alpha chain	Y83	1	1	P04439	P04439_Y83
+TK	ABL1	1B07_HUMAN	HLA class I histocompatibility antigen, B-7 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B08_HUMAN	HLA class I histocompatibility antigen, B-8 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B13_HUMAN	HLA class I histocompatibility antigen, B-13 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B14_HUMAN	HLA class I histocompatibility antigen, B-14 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B15_HUMAN	HLA class I histocompatibility antigen, B-15 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B18_HUMAN	HLA class I histocompatibility antigen, B-18 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B27_HUMAN	HLA class I histocompatibility antigen, B-27 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B35_HUMAN	HLA class I histocompatibility antigen, B-35 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B37_HUMAN	HLA class I histocompatibility antigen, B-37 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B38_HUMAN	HLA class I histocompatibility antigen, B-38 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B39_HUMAN	HLA class I histocompatibility antigen, B-39 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B40_HUMAN	HLA class I histocompatibility antigen, B-40 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B41_HUMAN	HLA class I histocompatibility antigen, B-41 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B42_HUMAN	HLA class I histocompatibility antigen, B-42 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B44_HUMAN	HLA class I histocompatibility antigen, B-44 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B45_HUMAN	HLA class I histocompatibility antigen, B-45 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B46_HUMAN	HLA class I histocompatibility antigen, B-46 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B47_HUMAN	HLA class I histocompatibility antigen, B-47 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B48_HUMAN	HLA class I histocompatibility antigen, B-48 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B49_HUMAN	HLA class I histocompatibility antigen, B-49 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B50_HUMAN	HLA class I histocompatibility antigen, B-50 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B51_HUMAN	HLA class I histocompatibility antigen, B-51 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B52_HUMAN	HLA class I histocompatibility antigen, B-52 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B53_HUMAN	HLA class I histocompatibility antigen, B-53 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B55_HUMAN	HLA class I histocompatibility antigen, B-55 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B56_HUMAN	HLA class I histocompatibility antigen, B-56 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B59_HUMAN	HLA class I histocompatibility antigen, B-59 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B67_HUMAN	HLA class I histocompatibility antigen, B-67 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B73_HUMAN	HLA class I histocompatibility antigen, B-73 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B78_HUMAN	HLA class I histocompatibility antigen, B-78 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B81_HUMAN	HLA class I histocompatibility antigen, B-81 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	1B82_HUMAN	HLA class I histocompatibility antigen, B-82 alpha chain	Y83	1	1	P01889	P01889_Y83
+TK	ABL1	2ABA_HUMAN	Serine/threonine-protein phosphatase 2A 55 kDa regulatory subunit B alpha isoform	Y143	1	1	P63151	P63151_Y143
+TK	ABL1	2ABA_HUMAN	Serine/threonine-protein phosphatase 2A 55 kDa regulatory subunit B alpha isoform	Y71	1	1	P63151	P63151_Y71
+TK	ABL1	2ABA_HUMAN	Serine/threonine-protein phosphatase 2A 55 kDa regulatory subunit B alpha isoform	Y74	1	1	P63151	P63151_Y74
+TK	ABL1	2ABB_HUMAN	Serine/threonine-protein phosphatase 2A 55 kDa regulatory subunit B beta isoform	Y67	1	1	Q00005	Q00005_Y67
+TK	ABL1	2ABB_HUMAN	Serine/threonine-protein phosphatase 2A 55 kDa regulatory subunit B beta isoform	Y70	1	1	Q00005	Q00005_Y70
+TK	ABL1	2ABD_HUMAN	Serine/threonine-protein phosphatase 2A 55 kDa regulatory subunit B delta isoform	Y77	1	1	Q66LE6	Q66LE6_Y77
+TK	ABL1	2ABD_HUMAN	Serine/threonine-protein phosphatase 2A 55 kDa regulatory subunit B delta isoform	Y80	1	1	Q66LE6	Q66LE6_Y80
+TK	ABL1	41_HUMAN	Protein 4.1	Y660	1	1	P11171	P11171_Y660
+TK	ABL1	6PGD_HUMAN	6-phosphogluconate dehydrogenase, decarboxylating	Y137	1	1	P52209	P52209_Y137
+TK	ABL1	AAPK1_HUMAN	5'-AMP-activated protein kinase catalytic subunit alpha-1	Y190	1	1	Q13131	Q13131_Y190
+TK	ABL1	AAPK2_HUMAN	5'-AMP-activated protein kinase catalytic subunit alpha-2	Y179	1	1	P54646	P54646_Y179
+TK	ABL1	AATM_HUMAN	Aspartate aminotransferase, mitochondrial	Y75	1	1	P00505	P00505_Y75
+TK	ABL1	AATM_HUMAN	Aspartate aminotransferase, mitochondrial	Y96	1	1	P00505	P00505_Y96
+TK	ABL1	ABCE1_HUMAN	ATP-binding cassette sub-family E member 1	Y594	1		P61221	P61221_Y594
+TK	ABL1	ABCF1_HUMAN	ATP-binding cassette sub-family F member 1	Y710	1	1	Q8NE71	Q8NE71_Y710
+TK	ABL1	ABCF1_HUMAN	ATP-binding cassette sub-family F member 1	Y719	1	1	Q8NE71	Q8NE71_Y719
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	S1106	1	1	P00519	P00519_S1106
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	S553	1	1	P00519	P00519_S553
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	S559	1	1	P00519	P00519_S559
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	S569	1	1	P00519	P00519_S569
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	S642	1	1	P00519	P00519_S642
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	S750	1	1	P00519	P00519_S750
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	S855	1	1	P00519	P00519_S855
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	S917	1	1	P00519	P00519_S917
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	T389		1	P00519	P00519_T389
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	T392	1		P00519	P00519_T392
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	T394	1		P00519	P00519_T394
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	T544	1	1	P00519	P00519_T544
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	T545	1		P00519	P00519_T545
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	T649	1	1	P00519	P00519_T649
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	T743	1		P00519	P00519_T743
+TK	ABL1	ABL1_HUMAN	Tyrosine-protein kinase ABL1	T751	1	1	P00519	P00519_T751

@@ -1,0 +1,5 @@
+__pycache__
+htmlcov
+.coverage
+notebooks
+.pytest_cache
