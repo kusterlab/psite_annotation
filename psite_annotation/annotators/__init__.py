@@ -13,6 +13,7 @@ Typical usage example:
 from .clinical_basket import ClinicalBasketAnnotator
 from .domain import DomainAnnotator
 from .in_vitro_kinases import InVitroKinasesAnnotator
+from .kinase_library import KinaseLibraryAnnotator
 from .motif import MotifAnnotator
 from .peptide_position import PeptidePositionAnnotator
 from .psp_kinases import PSPKinasesAnnotator

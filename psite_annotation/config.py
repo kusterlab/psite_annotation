@@ -13,7 +13,9 @@ default_config_json = """{
     "pspFastaFile": "./PhosphoSitePlus/Phosphosite_seq.fasta",
     "pspKinaseSubstrateFile": "./PhosphoSitePlus/Kinase_Substrate_Dataset",
     "pspAnnotationFile": "./PhosphoSitePlus/Phosphorylation_site_dataset",
-    "pspRegulatoryFile": "./PhosphoSitePlus/Regulatory_sites"
+    "pspRegulatoryFile": "./PhosphoSitePlus/Regulatory_sites",
+    "kinaseLibraryMotifsFile": "./Motif_Odds_Ratios.txt",
+    "kinaseLibraryQuantilesFile": "./Kinase_Score_Quantile_Matrix.txt"
 }"""
 
 
@@ -34,10 +36,11 @@ def _getConfigDicts():
 
     defaults = json.loads(default_config_json)
     user = json.loads(json_config)
+    
     return defaults, user
 
 
-def _setUserConfig(config_path_user: str):
+def setUserConfig(config_path_user: str):
     with open(config_path_user) as f:
         config_user = json.load(f)
 

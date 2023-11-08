@@ -17,6 +17,8 @@ __all__ = [
     "pspRegulatoryFile",
     "pspKinaseSubstrateFile",
     "pspFastaFile",
+    "kinaseLibraryMotifsFile",
+    "kinaseLibraryQuantilesFile",
     "addPeptideAndPsitePositions",
     "addSiteSequenceContext",
     "addPSPAnnotations",
@@ -26,6 +28,7 @@ __all__ = [
     "addMotifs",
     "addInVitroKinases",
     "addTurnoverRates",
+    "addKinaseLibraryAnnotations",
 ]
 
 defaults, user = _getConfigDicts()
@@ -40,6 +43,10 @@ pspAnnotationFile = _getConfigSetting("pspAnnotationFile", user, defaults)
 pspRegulatoryFile = _getConfigSetting("pspRegulatoryFile", user, defaults)
 pspKinaseSubstrateFile = _getConfigSetting("pspKinaseSubstrateFile", user, defaults)
 pspFastaFile = _getConfigSetting("pspFastaFile", user, defaults)
+kinaseLibraryMotifsFile = _getConfigSetting("kinaseLibraryMotifsFile", user, defaults)
+kinaseLibraryQuantilesFile = _getConfigSetting(
+    "kinaseLibraryQuantilesFile", user, defaults
+)
 
 
 def addPeptideAndPsitePositions(
@@ -264,6 +271,38 @@ def addInVitroKinases(df: pd.DataFrame, inVitroKinaseSubstrateMappingFile: str):
 
     """
     annotator = annotators.InVitroKinasesAnnotator(inVitroKinaseSubstrateMappingFile)
+    annotator.load_annotations()
+    df = annotator.annotate(df)
+
+    return df
+
+
+def addKinaseLibraryAnnotations(
+    df: pd.DataFrame, motifs_file: str, quantiles_file: str
+):
+    """Annotate pandas dataframe with highest scoring kinases from the kinase library.
+
+    Johnson et al. 2023, https://doi.org/10.1038/s41586-022-05575-3
+
+    Requires "Site sequence context" column in the dataframe to be present.
+    The "Site sequence context" column can be generated with PeptidePositionAnnotator().
+
+    Adds the following annotation columns to dataframe:
+    - Motif Kinases = semicolon separated list of kinases that match with the site sequence contexts
+    - Motif Scores = semicolon separated list of scores corresponding to Motif Kinases
+    - Motif Percentiles = semicolon separated list of percentiles corresponding to Motif Kinases
+    - Motif Totals = semicolon separated list of score*percentile corresponding to Motif Kinases
+
+    Args:
+        df: pandas dataframe with 'Site sequence context' column
+        motifs_file: tab separated file with in odds ratios for each kinase, AA and position
+        quantiles_file: tab separated file with quantile score for each kinase
+
+    Returns:
+        pd.DataFrame: annotated dataframe
+
+    """
+    annotator = annotators.KinaseLibraryAnnotator(motifs_file, quantiles_file)
     annotator.load_annotations()
     df = annotator.annotate(df)
 

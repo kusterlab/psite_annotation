@@ -164,5 +164,18 @@ class TestAddTurnoverRates:
         )
 
 
-if __name__ == "__main__":
-    unittest.main()
+class TestAddKinaseLibraryAnnotations:
+    def test_addKinaseLibraryAnnotations(self, curves_df):
+        curves_df = pa.addPeptideAndPsitePositions(curves_df, fastaFile)
+        curves_df = pa.addKinaseLibraryAnnotations(
+            curves_df, pa.kinaseLibraryMotifsFile, pa.kinaseLibraryQuantilesFile
+        )
+        print(curves_df[curves_df["Motif Kinases"] != ""].head(n=100))
+
+        assert (
+            curves_df[
+                curves_df["Modified sequence"]
+                == "(ac)ANQVNGNAVQLKEEEEPMDTSS(ph)VTHTEHYK"
+            ]["Motif Kinases"].values[0]
+            == "CK1A"
+        )
