@@ -213,5 +213,5 @@ output: pandas dataframe with the following added columns:
 Usage:
 
 ```
-df = pa.addTurnoverRates(df, pa.turnoverFile)
+df = pa.addKinaseLibraryAnnotations(df, pa.kinaseLibraryMotifsFile, pa.kinaseLibraryQuantilesFile)
 ```
