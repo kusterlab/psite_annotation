@@ -3,3 +3,4 @@ htmlcov
 .coverage
 notebooks
 .pytest_cache
+dist

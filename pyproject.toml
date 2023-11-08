@@ -1,8 +1,10 @@
 [tool.poetry]
 name = "psite-annotation"
-version = "0.2.0"
+version = "0.3.0"
 description = "Module for annotating p-sites based on resources such as PhosphoSitePlus"
 authors = ["Matthew The <matthew.the@tum.de>"]
+license= "Apache-2.0"
+readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.8.1,<4.0"
