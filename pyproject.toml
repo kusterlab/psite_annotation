@@ -2,7 +2,7 @@
 name = "psite-annotation"
 version = "0.3.0"
 description = "Module for annotating p-sites based on resources such as PhosphoSitePlus"
-authors = ["Matthew The <matthew.the@tum.de>"]
+authors = ["Matthew The <matthew.the@tum.de>", "Amirhossein Sakhteman <amirhossein.sakhteman@tum.de>", "Florian P. Bayer <f.bayer@tum.de>"]
 license= "Apache-2.0"
 readme = "README.md"
 
