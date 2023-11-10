@@ -58,12 +58,14 @@ def addPeptideAndPsitePositions(
     """Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
 
     Adds the following annotation columns to dataframe:
+    - 'Matched proteins' = subset of 'Proteins' in the input column in which the protein could indeed be found. If
+        the same peptide is found multiple times in the same protein sequence, the protein identifier will be repeated.
     - 'Start positions' = starting positions of the modified peptide in the protein sequence (1-based, methionine is
-      counted). If multiple isoforms/proteins contain the sequence, the starting positions are separated by
-      semicolons in the same order as they are listed in the 'Proteins' input column
+        counted). If multiple isoforms/proteins contain the sequence, the starting positions are separated by
+        semicolons in the same order as they are listed in the 'Matched proteins' column
     - 'End positions' = end positions of the modified peptide in the protein sequence (see above for details)
     - 'Site positions' = position of the modification (see 'Start positions' above for details on how the position
-      is counted)
+        is counted)
 
     Args:
         df: pandas dataframe with "Proteins" and "Modified sequence" columns
@@ -219,7 +221,7 @@ def addDomains(df: pd.DataFrame, domainMappingFile: str):
     - Domains = semicolon separated list of domains that overlap with the peptide
 
     Args:
-        df: pandas dataframe with 'Proteins', 'Start positions' and 'End positions' columns
+        df: pandas dataframe with 'Matched proteins', 'Start positions' and 'End positions' columns
         domainMappingFile: comma separated file with domains and their positions within the protein
 
     Returns:
@@ -240,7 +242,7 @@ def addMotifs(df: pd.DataFrame, motifsFile: str):
     - Motifs = semicolon separated list of motifs that match with the site sequence contexts
 
     Args:
-        df: pandas dataframe with 'Proteins', 'Start positions' and 'End positions' columns
+        df: pandas dataframe with 'Site sequence context' column
         motifsFile: tab separated file with motifs and their identifiers
 
     Returns:
@@ -285,7 +287,8 @@ def addKinaseLibraryAnnotations(
     Johnson et al. 2023, https://doi.org/10.1038/s41586-022-05575-3
 
     Requires "Site sequence context" column in the dataframe to be present.
-    The "Site sequence context" column can be generated with PeptidePositionAnnotator().
+    The "Site sequence context" column can be generated with PeptidePositionAnnotator()
+    followed by SiteSequenceContextAnnotator().
 
     Adds the following annotation columns to dataframe:
     - Motif Kinases = semicolon separated list of kinases that match with the site sequence contexts

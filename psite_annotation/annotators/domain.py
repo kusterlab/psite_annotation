@@ -8,8 +8,8 @@ import pandas as pd
 class DomainAnnotator:
     """Annotate pandas dataframe with domains from uniprot.
 
-    Requires 'Proteins', 'Start positions', 'End positions' columns in the dataframe to be annotated.
-    The 'Start positions', 'End positions' columns can be generated with PeptidePositionAnnotator().
+    Requires 'Matched proteins', 'Start positions', 'End positions' columns in the dataframe to be annotated.
+    The 'Matched proteins', 'Start positions', 'End positions' columns can be generated with PeptidePositionAnnotator().
 
     Typical usage example:
       annotator = DomainAnnotator(<path_to_annotation_file>)
@@ -61,7 +61,7 @@ class DomainAnnotator:
             annotated_df = df.copy()
 
         annotated_df["Domains"] = df[
-            ["Proteins", "Start positions", "End positions"]
+            ["Matched proteins", "Start positions", "End positions"]
         ].apply(lambda x: _get_domains(x[0], self.domain_dict, x[1], x[2]), axis=1)
 
         return annotated_df

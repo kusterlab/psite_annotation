@@ -50,7 +50,7 @@ class TestAddPSPAnnotations:
             curves_df, pa.pspFastaFile, pspInput=True
         )
         curves_df = pa.addPSPAnnotations(curves_df, pa.pspAnnotationFile)
-        print(list(curves_df.columns))
+        # print(list(curves_df.columns))
 
         assert (
             curves_df[
@@ -111,6 +111,9 @@ class TestAddDomains:
         curves_df = pa.addPeptideAndPsitePositions(curves_df, fastaFile)
         curves_df = pa.addDomains(curves_df, pa.domainMappingFile)
         # print(curves_df.head())
+        # print(curves_df[
+        #         curves_df["Modified sequence"] == "(ac)AAAAAAAGDS(ph)DSWDADAFSVEDPVRK"
+        #     ])
 
         assert (
             curves_df[
@@ -170,7 +173,7 @@ class TestAddKinaseLibraryAnnotations:
         curves_df = pa.addKinaseLibraryAnnotations(
             curves_df, pa.kinaseLibraryMotifsFile, pa.kinaseLibraryQuantilesFile
         )
-        print(curves_df[curves_df["Motif Kinases"] != ""].head(n=100))
+        # print(curves_df[curves_df["Motif Kinases"] != ""].head(n=100))
 
         assert (
             curves_df[

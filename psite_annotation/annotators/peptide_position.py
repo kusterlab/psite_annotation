@@ -6,10 +6,10 @@ import pandas as pd
 
 MOD_DICT = {
     "K(ac)": "k",
-    "K( GlyGly (K) without TMT)" : "k",
-    "K( GlyGly )" : "k",
-    "K(GlyGly)" : "k",
-    "C(dbia)" : "c",
+    "K( GlyGly (K) without TMT)": "k",
+    "K( GlyGly )": "k",
+    "K(GlyGly)": "k",
+    "C(dbia)": "c",
     "K(Acetyl (K))": "k",
     "S(ph)": "s",
     "T(ph)": "t",
@@ -44,9 +44,8 @@ class PeptidePositionAnnotator:
         annotation_file: str,
         pspInput: bool = False,
         returnAllPotentialSites: bool = False,
-        mod_regex = MOD_REGEX,
-        mod_pattern = MOD_PATTERN
-
+        mod_regex=MOD_REGEX,
+        mod_pattern=MOD_PATTERN,
     ):
         """
         Initialize the input files and options for PeptidePositionAnnotator.
@@ -78,9 +77,11 @@ class PeptidePositionAnnotator:
         """Adds columns regarding the peptide position within the protein to a pandas dataframe.
 
         Adds the following annotation columns to dataframe:
+        - 'Matched proteins' = subset of 'Proteins' in the input column in which the protein could indeed be found. If
+          the same peptide is found multiple times, the protein identifier will be repeated.
         - 'Start positions' = starting positions of the modified peptide in the protein sequence (1-based, methionine is
           counted). If multiple isoforms/proteins contain the sequence, the starting positions are separated by
-          semicolons in the same order as they are listed in the 'Proteins' input column
+          semicolons in the same order as they are listed in the 'Matched proteins' column
         - 'End positions' = end positions of the modified peptide in the protein sequence (see above for details)
         - 'Site positions' = position of the modification (see 'Start positions' above for details on how the position
           is counted)
@@ -92,18 +93,23 @@ class PeptidePositionAnnotator:
             pd.DataFrame: annotated dataframe
 
         """
-        MOD_REGEX = self.MOD_REGEX 
+        MOD_REGEX = self.MOD_REGEX
         MOD_PATTERN = self.MOD_PATTERN
-        df[["Start positions", "End positions", "Site positions",]] = df[
-            ["Proteins", "Modified sequence"]
-        ].apply(
+        df[
+            [
+                "Matched proteins",
+                "Start positions",
+                "End positions",
+                "Site positions",
+            ]
+        ] = df[["Proteins", "Modified sequence"]].apply(
             lambda x: _get_peptide_positions(
                 x["Proteins"],
                 self.protein_sequences,
                 x["Modified sequence"],
                 self.returnAllPotentialSites,
-                self.MOD_REGEX ,
-                self.MOD_PATTERN
+                self.MOD_REGEX,
+                self.MOD_PATTERN,
             ),
             axis=1,
             result_type="expand",
@@ -111,24 +117,36 @@ class PeptidePositionAnnotator:
         return df
 
 
-def _make_maxquant_mods_consistent(text,mod_regex = MOD_REGEX):
+def _make_maxquant_mods_consistent(text, mod_regex=MOD_REGEX):
     return mod_regex.sub(lambda match: MOD_DICT[match.group(0)], text)
 
 
 def _get_peptide_positions(
-    proteinIds, protein_sequences, mod_peptide_sequence, returnAllPotentialSites=False,mod_regex = MOD_REGEX,mod_pattern = MOD_PATTERN
+    proteinIds,
+    protein_sequences,
+    mod_peptide_sequence,
+    returnAllPotentialSites=False,
+    mod_regex=MOD_REGEX,
+    mod_pattern=MOD_PATTERN,
 ):
-    if str(proteinIds) == "nan":
-        return ("", "", "")
+    if str(proteinIds) == "nan" or len(mod_peptide_sequence) == 0:
+        return ("", "", "", "")
 
-    mod_peptide_sequence = _make_maxquant_mods_consistent(mod_peptide_sequence,mod_regex)
+    mod_peptide_sequence = _make_maxquant_mods_consistent(
+        mod_peptide_sequence, mod_regex
+    )
 
     if returnAllPotentialSites:
         mod_peptide_sequence = (
-            mod_peptide_sequence.replace("S", "s").replace("T", "t").replace("Y", "y").replace("K", "k").replace("c", "C")
+            mod_peptide_sequence.replace("S", "s")
+            .replace("T", "t")
+            .replace("Y", "y")
+            .replace("K", "k")
+            .replace("c", "C")
         )
 
-    startPositions, endPositions, proteinPositions = (
+    matchedProteins, startPositions, endPositions, proteinPositions = (
+        list(),
         list(),
         list(),
         list(),
@@ -140,15 +158,20 @@ def _get_peptide_positions(
         if "|" in proteinId:
             proteinId = proteinId.split("|")[1]
 
-        start_position = protein_sequences[proteinId].find(mod_peptide_sequence.upper())
-        end_position = start_position + len(mod_peptide_sequence)
-        if start_position == -1:
-            end_position = -1
+        start_position = -1
+        while True:
+            start_position = protein_sequences[proteinId].find(
+                mod_peptide_sequence.upper(), start_position + 1
+            )
+            if start_position == -1:
+                break
 
-        startPositions.append(start_position)
-        endPositions.append(end_position)
+            end_position = start_position + len(mod_peptide_sequence)
 
-        if start_position != -1:
+            matchedProteins.append(proteinId)
+            startPositions.append(start_position)
+            endPositions.append(end_position)
+
             for mod in mod_pattern.finditer(mod_peptide_sequence):
                 sitePos = start_position + mod.start()
                 site_position_string = (
@@ -158,6 +181,7 @@ def _get_peptide_positions(
                 proteinPositions.append(site_position_string)
 
     return (
+        ";".join(map(str, matchedProteins)),
         ";".join(map(str, startPositions)),
         ";".join(map(str, endPositions)),
         ";".join(sorted(set(proteinPositions))),

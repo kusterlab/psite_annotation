@@ -42,6 +42,12 @@ def input_df() -> pd.DataFrame:
                 "Q6ZU52-2",
                 "P05067",
             ],
+            "Matched proteins": [
+                "Q86VB7-4",
+                "Q8WZ42-10;O60566-3",
+                "Q6ZU52-2",
+                "P05067",
+            ],
             "Start positions": [
                 "480",
                 "29218;460",
@@ -69,6 +75,12 @@ def expected_output_df() -> pd.DataFrame:
     return pd.DataFrame(
         {
             "Proteins": [
+                "Q86VB7-4",
+                "Q8WZ42-10;O60566-3",
+                "Q6ZU52-2",
+                "P05067",
+            ],
+            "Matched proteins": [
                 "Q86VB7-4",
                 "Q8WZ42-10;O60566-3",
                 "Q6ZU52-2",
@@ -135,6 +147,7 @@ class TestDomainAnnotator:
         # Assert that the output dataframe has the expected columns
         assert set(output_df.columns) == {
             "Proteins",
+            "Matched proteins",
             "Start positions",
             "End positions",
             "Domains",
