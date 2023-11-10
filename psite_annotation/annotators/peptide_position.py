@@ -73,7 +73,7 @@ class PeptidePositionAnnotator:
         for proteinId, seq in readFasta(self.annotation_file):
             self.protein_sequences[proteinId] = seq
 
-    def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
+    def annotate(self, df: pd.DataFrame, inplace: bool=False) -> pd.DataFrame:
         """Adds columns regarding the peptide position within the protein to a pandas dataframe.
 
         Adds the following annotation columns to dataframe:
@@ -93,16 +93,18 @@ class PeptidePositionAnnotator:
             pd.DataFrame: annotated dataframe
 
         """
-        MOD_REGEX = self.MOD_REGEX
-        MOD_PATTERN = self.MOD_PATTERN
-        df[
+        annotated_df = df
+        if not inplace:
+            annotated_df = df.copy()
+
+        annotated_df[
             [
                 "Matched proteins",
                 "Start positions",
                 "End positions",
                 "Site positions",
             ]
-        ] = df[["Proteins", "Modified sequence"]].apply(
+        ] = annotated_df[["Proteins", "Modified sequence"]].apply(
             lambda x: _get_peptide_positions(
                 x["Proteins"],
                 self.protein_sequences,
@@ -114,7 +116,7 @@ class PeptidePositionAnnotator:
             axis=1,
             result_type="expand",
         )
-        return df
+        return annotated_df
 
 
 def _make_maxquant_mods_consistent(text, mod_regex=MOD_REGEX):
