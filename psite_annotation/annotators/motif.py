@@ -5,6 +5,7 @@ from typing import IO, Dict, List, Union
 
 import pandas as pd
 
+from .annotator_base import check_columns
 from .separated_strings import combine_separated_strings
 
 
@@ -52,6 +53,7 @@ class MotifAnnotator:
                 ".*" + row[regex_col] + ".*"
             )
 
+    @check_columns(["Site sequence context"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds column with motifs the site sequence context matches with.
 

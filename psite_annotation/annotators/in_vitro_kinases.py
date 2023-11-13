@@ -1,5 +1,6 @@
 import pandas as pd
 
+from .annotator_base import check_columns
 from .separated_strings import combine_separated_strings, merge_on_separated_string
 
 
@@ -39,6 +40,7 @@ class InVitroKinasesAnnotator:
             columns={"Kinase": "In Vitro Kinases", "UniprotId_Site": "Site positions"}
         )
 
+    @check_columns(["Site positions"])
     def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
         """Adds column with phosphorylating kinases.
 

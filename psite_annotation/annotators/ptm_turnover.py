@@ -1,5 +1,7 @@
 import pandas as pd
 
+from .annotator_base import check_columns
+
 
 class PTMTurnoverAnnotator:
     """Annotate pandas dataframe with Jana's PTM Turnover data.
@@ -52,6 +54,7 @@ class PTMTurnoverAnnotator:
         self.turnover_df = self.turnover_df.explode("Peptidoforms")
         self.turnover_df = self.turnover_df.set_index("Peptidoforms")
 
+    @check_columns(["Modified sequence"])
     def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
         """Adds column regarding the PTM turnover behavior.
 

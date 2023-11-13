@@ -4,6 +4,8 @@ import pandas as pd
 import numpy as np
 from scipy import interpolate
 
+from .annotator_base import check_columns
+
 
 class KinaseLibraryAnnotator:
     """Annotate pandas dataframe with highest scoring kinases from the kinase library.
@@ -52,6 +54,7 @@ class KinaseLibraryAnnotator:
         for kinase, q in quantile_matrix_df.iterrows():
             self.quantiles[kinase] = _build_ecdf(scores=q.index, quantiles=q.values)
 
+    @check_columns(["Site sequence context"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds column with motifs the site sequence context matches with.
 
@@ -69,11 +72,6 @@ class KinaseLibraryAnnotator:
             pd.DataFrame: annotated dataframe
 
         """
-        if not "Site sequence context" in df.columns:
-            raise ValueError(
-                'Could not find "Site sequence context" column in the dataframe, this column can be added using PeptidePositionAnnotator().'
-            )
-        
         annotated_df = df
         if not inplace:
             annotated_df = df.copy()

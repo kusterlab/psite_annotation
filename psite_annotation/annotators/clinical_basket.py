@@ -1,5 +1,6 @@
 import pandas as pd
 
+from .annotator_base import check_columns
 from .separated_strings import (
     combine_separated_strings,
     explode_on_separated_string,
@@ -52,6 +53,7 @@ class ClinicalBasketAnnotator:
         # make the "Gene names" column an ordinary column again
         self.basket_df = self.basket_df.reset_index()
 
+    @check_columns(["Gene names"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds column with baskets the gene names correspond to.
 

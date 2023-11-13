@@ -2,6 +2,7 @@ import io
 
 import pandas as pd
 import pytest
+from psite_annotation.annotators.annotator_base import MissingColumnsError
 
 from psite_annotation.annotators.psp_kinases import PSPKinasesAnnotator
 
@@ -147,3 +148,22 @@ class TestPSPKinasesAnnotator:
             }
         )
         pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
+    
+    def test_raise_error_on_missing_input_columns(self, annotator):
+        """Test that a value error is raised if the "Site positions" column is missing.
+
+        Args:
+            annotator: Annotator object with mock file loaded
+        """
+        annotator.load_annotations()
+
+        input_df = pd.DataFrame(
+            {
+                "Sequence": [
+                    "AAAAAAAAG",
+                    "AAAAAAAAG",
+                ],
+            }
+        )
+        with pytest.raises(MissingColumnsError):
+            annotator.annotate(input_df)

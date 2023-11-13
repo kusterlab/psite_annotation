@@ -2,6 +2,7 @@ import io
 
 import pandas as pd
 import pytest
+from psite_annotation.annotators.annotator_base import MissingColumnsError
 
 from psite_annotation.annotators.domain import DomainAnnotator
 
@@ -156,6 +157,25 @@ class TestDomainAnnotator:
         # Assert that the output dataframe has the expected values
         pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
 
+    def test_raise_error_on_missing_input_columns(self, annotator):
+        """Test that a value error is raised if the "Matching proteins", "Start positions" or "End positions" column is missing.
+
+        Args:
+            annotator: Annotator object with mock file loaded
+        """
+        annotator.load_annotations()
+
+        input_df = pd.DataFrame(
+            {
+                "Sequence": [
+                    "AAAAAAAAG",
+                    "AAAAAAAAG",
+                ],
+            }
+        )
+        with pytest.raises(MissingColumnsError):
+            annotator.annotate(input_df)
+            
     def test_annotate_input_df_unchanged(self, annotator, input_df):
         """Test that the annotate method does not alter the input dataframe.
 

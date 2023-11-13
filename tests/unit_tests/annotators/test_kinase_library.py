@@ -1,8 +1,8 @@
 import io
-import re
 
 import pandas as pd
 import pytest
+from psite_annotation.annotators.annotator_base import MissingColumnsError
 
 from psite_annotation.annotators.kinase_library import KinaseLibraryAnnotator
 
@@ -123,7 +123,7 @@ class TestKinaseLibraryAnnotator:
                 ],
             }
         )
-        with pytest.raises(ValueError):
+        with pytest.raises(MissingColumnsError):
             annotator.annotate(input_df)
 
     def test_annotate(self, annotator, input_df, expected_output_df):

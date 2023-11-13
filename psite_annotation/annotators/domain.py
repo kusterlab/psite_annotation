@@ -4,6 +4,8 @@ from typing import IO, Dict, List, Union
 
 import pandas as pd
 
+from .annotator_base import check_columns
+
 
 class DomainAnnotator:
     """Annotate pandas dataframe with domains from uniprot.
@@ -42,6 +44,7 @@ class DomainAnnotator:
         for row in reader:
             self.domain_dict[row[0]].append((int(row[2]), int(row[3]), row[1]))
 
+    @check_columns(["Matched proteins", "Start positions", "End positions"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds column with domains the peptide overlaps with.
 

@@ -11,7 +11,7 @@ def test_annotateYasushi():
     )
     df = df.rename(columns={"UniprotId_Site": "Site positions"})
 
-    pa.addSiteSequenceContext(df, pa.pspFastaFile, pspInput=True)
+    df = pa.addSiteSequenceContext(df, pa.pspFastaFile, pspInput=True)
 
     assert df.loc[0, "Site sequence context"] == "AFDEAIAELDTLNEEsYKDSTLIMQLLRDNL"
 

@@ -1,5 +1,6 @@
 import pandas as pd
 
+from .annotator_base import check_columns
 from .separated_strings import combine_separated_strings, merge_on_separated_string
 
 
@@ -50,6 +51,7 @@ class PSPKinasesAnnotator:
         # make the "Site positions" an ordinary column again
         self.psp_df = self.psp_df.reset_index()
 
+    @check_columns(["Site positions"])
     def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
         """Adds column with phosphorylating kinases.
 

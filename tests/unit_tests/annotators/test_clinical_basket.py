@@ -4,6 +4,7 @@ from unittest.mock import patch
 import pandas as pd
 import pytest
 
+from psite_annotation.annotators.annotator_base import MissingColumnsError
 from psite_annotation.annotators.clinical_basket import ClinicalBasketAnnotator
 
 # Define the mock input file as a string
@@ -147,6 +148,31 @@ class TestClinicalBasketAnnotator:
         # Assert that the output dataframe has the expected values
 
         pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
+
+    @patch("pandas.read_excel")
+    def test_raise_error_on_missing_input_columns(
+        self, read_excel_method, mock_df: pd.DataFrame
+    ):
+        """Test that a value error is raised if the "Gene names" column is missing.
+
+        Args:
+            annotator: Annotator object with mock file loaded
+        """
+        read_excel_method.return_value = mock_df
+
+        annotator = ClinicalBasketAnnotator("")
+        annotator.load_annotations()
+
+        input_df = pd.DataFrame(
+            {
+                "Sequence": [
+                    "AAAAAAAAG",
+                    "AAAAAAAAG",
+                ],
+            }
+        )
+        with pytest.raises(MissingColumnsError):
+            annotator.annotate(input_df)
 
     @patch("pandas.read_excel")
     def test_annotate_input_df_unchanged(

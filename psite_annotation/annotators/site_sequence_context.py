@@ -3,6 +3,7 @@ from typing import Dict, Tuple
 
 import pandas as pd
 
+from .annotator_base import check_columns
 from .peptide_position import _read_fasta_maxquant, _read_fasta_phosphositeplus
 
 
@@ -42,7 +43,8 @@ class SiteSequenceContextAnnotator:
         for proteinId, seq in readFasta(self.annotation_file):
             self.protein_sequences[proteinId] = seq
 
-    def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
+    @check_columns(["Site positions"])
+    def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds columns regarding the peptide position within the protein to a pandas dataframe.
 
         Adds the following annotation columns to dataframe:
@@ -55,10 +57,14 @@ class SiteSequenceContextAnnotator:
             pd.DataFrame: annotated dataframe
 
         """
-        df["Site sequence context"] = df["Site positions"].apply(
+        annotated_df = df
+        if not inplace:
+            annotated_df = df.copy()
+
+        annotated_df["Site sequence context"] = annotated_df["Site positions"].apply(
             lambda x: _get_site_sequence_contexts(x, self.protein_sequences)
         )
-        return df
+        return annotated_df
 
 
 def _get_site_sequence_contexts(

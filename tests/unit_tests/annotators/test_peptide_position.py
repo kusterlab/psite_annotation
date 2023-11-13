@@ -1,10 +1,10 @@
-import io
 import unittest
 import unittest.mock
 
 import pytest
 import pandas as pd
 
+from psite_annotation.annotators.annotator_base import MissingColumnsError
 import psite_annotation.annotators.peptide_position as pa
 
 
@@ -213,6 +213,33 @@ class TestPeptidePositionAnnotator:
 
         # Assert that the output dataframe has the expected values
         pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
+
+    @unittest.mock.patch(
+        "builtins.open",
+        new=unittest.mock.mock_open(read_data=mock_input_file),
+        create=True,
+    )
+    def test_annotate(self, annotator, input_df, expected_output_df):
+        """Test that the annotate method correctly adds the motif annotations to the input dataframe as new column.
+
+        Args:
+            annotator: Annotator object with mock file loaded
+            input_df: Example input dataframe
+            expected_output_df: Expected output dataframe
+
+        """
+        annotator.load_annotations()
+
+        input_df = pd.DataFrame(
+            {
+                "Sequence": [
+                    "AAAAAAAAG",
+                    "AAAAAAAAG",
+                ],
+            }
+        )
+        with pytest.raises(MissingColumnsError):
+            annotator.annotate(input_df)
 
     @unittest.mock.patch(
         "builtins.open",
