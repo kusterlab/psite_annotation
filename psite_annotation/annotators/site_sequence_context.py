@@ -20,6 +20,8 @@ class SiteSequenceContextAnnotator:
         self,
         annotation_file: str,
         pspInput: bool = False,
+        context_left: int = 15,
+        context_right: int = 15,
     ):
         """
         Initialize the input files and options for PeptidePositionAnnotator.
@@ -27,11 +29,15 @@ class SiteSequenceContextAnnotator:
         Args:
             annotation_file: fasta file containing protein sequences
             pspInput: set to True if fasta file was obtained from PhosphositePlus
+            context_left: number of amino acids to the left of the modification to include
+            context_right: number of amino acids to the right of the modification to include
 
         """
         self.annotation_file = annotation_file
         self.pspInput = pspInput
         self.protein_sequences = None
+        self.context_left = context_left
+        self.context_right = context_right
 
     def load_annotations(self) -> None:
         """Reads in protein sequences from fasta file."""
@@ -44,9 +50,7 @@ class SiteSequenceContextAnnotator:
             self.protein_sequences[proteinId] = seq
 
     @check_columns(["Site positions"])
-    def annotate(
-        self, df: pd.DataFrame, inplace: bool = False, **kwargs
-    ) -> pd.DataFrame:
+    def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds columns regarding the peptide position within the protein to a pandas dataframe.
 
         Adds the following annotation columns to dataframe:
@@ -54,8 +58,7 @@ class SiteSequenceContextAnnotator:
 
         Args:
             df: pandas dataframe to be annotated which contains a column "Site positions"
-            inplace: add the new column in place
-            **kwargs: arbitrary keyword arguments.
+            inplace: add the new column to df in place
 
         Returns:
             pd.DataFrame: annotated dataframe
@@ -66,7 +69,12 @@ class SiteSequenceContextAnnotator:
             annotated_df = df.copy()
 
         annotated_df["Site sequence context"] = annotated_df["Site positions"].apply(
-            lambda x: _get_site_sequence_contexts(x, self.protein_sequences, **kwargs)
+            lambda x: _get_site_sequence_contexts(
+                x,
+                self.protein_sequences,
+                context_left=self.context_left,
+                context_right=self.context_right,
+            )
         )
         return annotated_df
 

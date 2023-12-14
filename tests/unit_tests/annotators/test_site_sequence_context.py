@@ -58,6 +58,16 @@ def annotator_psp() -> pa.SiteSequenceContextAnnotator:
 
 
 @pytest.fixture
+def annotator_custom_context() -> pa.SiteSequenceContextAnnotator:
+    """Fixture to create a MotifAnnotator object using a mock input file.
+
+    Returns:
+        MotifAnnotator: Annotator object with mock file loaded
+    """
+    return pa.SiteSequenceContextAnnotator("", context_left=5, context_right=4)
+
+
+@pytest.fixture
 def input_df() -> pd.DataFrame:
     """Fixture to create an example input dataframe to the annotate() method.
 
@@ -100,6 +110,34 @@ def expected_output_df() -> pd.DataFrame:
                 "DAGARPGLCRMCGRGsESIKIPRSKQSINNQ;GARPGLCRMCGRGSEsIKIPRSKQSINNQRQ",
                 "",
                 "CTSQSACHGHTMFSWsEQNGQMVEMIRSMAR",
+                "",
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def expected_output_df_custom_context() -> pd.DataFrame:
+    """Fixture to create an example ouput dataframe to the annotate() method given the input_df fixture.
+
+    Returns:
+        pd.DataFrame: Output dataframe corresponding to input_df fixture
+
+    """
+    return pd.DataFrame(
+        {
+            "Site positions": [
+                "E9PL77_T13",
+                "E9PL77_S30;E9PL77_S32",
+                "",
+                "F2Z2P1_S53",
+                "",
+            ],
+            "Site sequence context": [
+                "HRAGStKDAG",
+                "GRGSEsIKIP;MCGRGsESIK",
+                "",
+                "TMFSWsEQNG",
                 "",
             ],
         }
@@ -174,6 +212,38 @@ class TestSiteSequenceContextAnnotator:
 
         # Assert that the output dataframe has the expected values
         pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
+
+    @unittest.mock.patch(
+        "builtins.open",
+        new=unittest.mock.mock_open(read_data=mock_input_file),
+        create=True,
+    )
+    def test_annotate_custom_context(
+        self, annotator_custom_context, input_df, expected_output_df_custom_context
+    ):
+        """Test that the annotate method correctly adds the motif annotations to the input dataframe as new column.
+
+        Args:
+            annotator_custom_context: Annotator object with mock file loaded
+            input_df: Example input dataframe
+            expected_output_df_custom_context: Expected output dataframe
+
+        """
+        annotator_custom_context.load_annotations()
+
+        # Annotate the input dataframe
+        output_df = annotator_custom_context.annotate(input_df)
+
+        # Assert that the output dataframe has the expected columns
+        assert set(output_df.columns) == {
+            "Site positions",
+            "Site sequence context",
+        }
+
+        # Assert that the output dataframe has the expected values
+        pd.testing.assert_frame_equal(
+            output_df, expected_output_df_custom_context, check_like=True
+        )
 
     @unittest.mock.patch(
         "builtins.open",

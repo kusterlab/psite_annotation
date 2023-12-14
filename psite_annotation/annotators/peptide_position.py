@@ -56,14 +56,16 @@ class PeptidePositionAnnotator:
             annotation_file: fasta file containing protein sequences
             pspInput: set to True if fasta file was obtained from PhosphositePlus
             returnAllPotentialSites: set to True if all S, T and Y positions should be returned as potention p-sites.
+            mod_regex: regex to capture all modification strings
+            mod_pattern: regex to capture all single letter modifications
 
         """
         self.annotation_file = annotation_file
         self.pspInput = pspInput
         self.returnAllPotentialSites = returnAllPotentialSites
         self.protein_sequences = None
-        self.MOD_REGEX = mod_regex
-        self.MOD_PATTERN = mod_pattern
+        self.mod_regex = mod_regex
+        self.mod_pattern = mod_pattern
 
     def load_annotations(self) -> None:
         """Reads in protein sequences from fasta file."""
@@ -91,6 +93,7 @@ class PeptidePositionAnnotator:
 
         Args:
             df: pandas dataframe to be annotated with "Proteins" and "Modified sequence" columns
+            inplace: add the new column to df in place
 
         Returns:
             pd.DataFrame: annotated dataframe
@@ -113,8 +116,8 @@ class PeptidePositionAnnotator:
                 self.protein_sequences,
                 x["Modified sequence"],
                 self.returnAllPotentialSites,
-                self.MOD_REGEX,
-                self.MOD_PATTERN,
+                self.mod_regex,
+                self.mod_pattern,
             ),
             axis=1,
             result_type="expand",
