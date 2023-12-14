@@ -54,6 +54,9 @@ def addPeptideAndPsitePositions(
     fastaFile: str,
     pspInput: bool = False,
     returnAllPotentialSites: bool = False,
+    context_left: int = 15,
+    context_right: int = 15,
+    retain_other_mods: bool = False,
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
 
@@ -72,6 +75,9 @@ def addPeptideAndPsitePositions(
         fastaFile: fasta file containing protein sequences
         pspInput: set to True if fasta file was obtained from PhosphositePlus
         returnAllPotentialSites: set to True if all S, T and Y positions should be returned as potention p-sites.
+        context_left: number of amino acids to the left of the modification to include
+        context_right: number of amino acids to the right of the modification to include
+        retain_other_mods: retain other modifications from the modified peptide in the sequence context in lower case
 
     Returns:
         pd.DataFrame: annotated dataframe
@@ -83,7 +89,13 @@ def addPeptideAndPsitePositions(
     peptide_position_annotator.load_annotations()
     df = peptide_position_annotator.annotate(df)
 
-    annotator = annotators.SiteSequenceContextAnnotator(fastaFile, pspInput)
+    annotator = annotators.SiteSequenceContextAnnotator(
+        fastaFile,
+        pspInput=pspInput,
+        context_left=context_left,
+        context_right=context_right,
+        retain_other_mods=retain_other_mods,
+    )
     annotator.load_annotations()
     df = annotator.annotate(df)
 
@@ -91,7 +103,12 @@ def addPeptideAndPsitePositions(
 
 
 def addSiteSequenceContext(
-    df: pd.DataFrame, fastaFile: str, pspInput: bool = False
+    df: pd.DataFrame,
+    fastaFile: str,
+    pspInput: bool = False,
+    context_left: int = 15,
+    context_right: int = 15,
+    retain_other_mods: bool = False,
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with sequence context of a p-site.
 
@@ -102,12 +119,21 @@ def addSiteSequenceContext(
         df: pandas dataframe with 'Site positions' column
         fastaFile: fasta file containing protein sequences
         pspInput: set to True if fasta file was obtained from PhosphositePlus
+        context_left: number of amino acids to the left of the modification to include
+        context_right: number of amino acids to the right of the modification to include
+        retain_other_mods: retain other modifications from the modified peptide in the sequence context in lower case
 
     Returns:
         pd.DataFrame: annotated dataframe
 
     """
-    annotator = annotators.SiteSequenceContextAnnotator(fastaFile, pspInput)
+    annotator = annotators.SiteSequenceContextAnnotator(
+        fastaFile,
+        pspInput=pspInput,
+        context_left=context_left,
+        context_right=context_right,
+        retain_other_mods=retain_other_mods,
+    )
     annotator.load_annotations()
     df = annotator.annotate(df)
 

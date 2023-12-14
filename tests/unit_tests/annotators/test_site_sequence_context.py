@@ -1,12 +1,12 @@
+import collections
 import unittest
 import unittest.mock
-import collections
 
-import pytest
 import pandas as pd
-from psite_annotation.annotators.annotator_base import MissingColumnsError
+import pytest
 
 import psite_annotation.annotators.site_sequence_context as pa
+from psite_annotation.annotators.annotator_base import MissingColumnsError
 
 # Define the mock input file as a string
 mock_input_file = """>tr|E9PL77|E9PL77_HUMAN Uncharacterized protein
@@ -34,7 +34,7 @@ LRITTRKTPCGEGSKTWDRFQMRIHKRLIDLHSPSEIVKQITSISIEPGVEVEVTIADA
 MADEATRRVVSEIPVLKTNAGPRDRELWVQRLKEEYQSLIRYVENNKNADNDWFRLESNK
 EGTRWFGKCWYIHDLLKYEFDIEFDIPITYPTTAPEIAVPELDGKTAKMYRGGKICLTDH
 FKPLWARNVPKFGLAHLMALGLGPWLAVEIPDLIQKGVIQHKEKCNQ
-"""
+"""  # noqa: E501, B950
 
 
 @pytest.fixture
@@ -55,6 +55,16 @@ def annotator_psp() -> pa.SiteSequenceContextAnnotator:
         MotifAnnotator: Annotator object with mock file loaded
     """
     return pa.SiteSequenceContextAnnotator("", pspInput=True)
+
+
+@pytest.fixture
+def annotator_custom_context() -> pa.SiteSequenceContextAnnotator:
+    """Fixture to create a MotifAnnotator object using a mock input file.
+
+    Returns:
+        MotifAnnotator: Annotator object with mock file loaded
+    """
+    return pa.SiteSequenceContextAnnotator("", context_left=5, context_right=4)
 
 
 @pytest.fixture
@@ -106,6 +116,34 @@ def expected_output_df() -> pd.DataFrame:
     )
 
 
+@pytest.fixture
+def expected_output_df_custom_context() -> pd.DataFrame:
+    """Fixture to create an example ouput dataframe to the annotate() method given the input_df fixture.
+
+    Returns:
+        pd.DataFrame: Output dataframe corresponding to input_df fixture
+
+    """
+    return pd.DataFrame(
+        {
+            "Site positions": [
+                "E9PL77_T13",
+                "E9PL77_S30;E9PL77_S32",
+                "",
+                "F2Z2P1_S53",
+                "",
+            ],
+            "Site sequence context": [
+                "HRAGStKDAG",
+                "GRGSEsIKIP;MCGRGsESIK",
+                "",
+                "TMFSWsEQNG",
+                "",
+            ],
+        }
+    )
+
+
 class TestSiteSequenceContextAnnotator:
     """Test the SiteSequenceContextAnnotator class."""
 
@@ -115,7 +153,7 @@ class TestSiteSequenceContextAnnotator:
         create=True,
     )
     def test_load_annotations(self, annotator):
-        """Test that the load_annotations method correctly loads the annotations from the input file into `protein_sequences`.
+        """Test that load_annotations method loads annotations from the input file into `protein_sequences`.
 
         Args:
             annotator: Annotator object with mock file loaded
@@ -133,12 +171,12 @@ class TestSiteSequenceContextAnnotator:
         create=True,
     )
     def test_load_annotations_psp(self, annotator_psp):
-        """Test that the load_annotations method correctly loads the annotations from the input file into `protein_sequences`.
+        """Test that load_annotations method loads annotations from the input file into `protein_sequences`.
 
         The PSP fasta reader should ignore non-human sequences.
 
         Args:
-            annotator: Annotator object with mock file loaded
+            annotator_psp: Annotator object with mock file loaded
         """
         annotator_psp.load_annotations()
 
@@ -168,12 +206,8 @@ class TestSiteSequenceContextAnnotator:
 
         # Assert that the output dataframe has the expected columns
         assert set(output_df.columns) == {
-            "Proteins",
-            "Modified sequence",
-            "Matched proteins",
-            "Start positions",
-            "End positions",
             "Site positions",
+            "Site sequence context",
         }
 
         # Assert that the output dataframe has the expected values
@@ -184,13 +218,43 @@ class TestSiteSequenceContextAnnotator:
         new=unittest.mock.mock_open(read_data=mock_input_file),
         create=True,
     )
-    def test_annotate(self, annotator, input_df, expected_output_df):
+    def test_annotate_custom_context(
+        self, annotator_custom_context, input_df, expected_output_df_custom_context
+    ):
         """Test that the annotate method correctly adds the motif annotations to the input dataframe as new column.
 
         Args:
-            annotator: Annotator object with mock file loaded
+            annotator_custom_context: Annotator object with mock file loaded
             input_df: Example input dataframe
-            expected_output_df: Expected output dataframe
+            expected_output_df_custom_context: Expected output dataframe
+
+        """
+        annotator_custom_context.load_annotations()
+
+        # Annotate the input dataframe
+        output_df = annotator_custom_context.annotate(input_df)
+
+        # Assert that the output dataframe has the expected columns
+        assert set(output_df.columns) == {
+            "Site positions",
+            "Site sequence context",
+        }
+
+        # Assert that the output dataframe has the expected values
+        pd.testing.assert_frame_equal(
+            output_df, expected_output_df_custom_context, check_like=True
+        )
+
+    @unittest.mock.patch(
+        "builtins.open",
+        new=unittest.mock.mock_open(read_data=mock_input_file),
+        create=True,
+    )
+    def test_annotate_missing_site_positions_column(self, annotator):
+        """Test that the annotate method correctly raises an error if Site positions column is missing.
+
+        Args:
+            annotator: Annotator object with mock file loaded
 
         """
         annotator.load_annotations()
@@ -267,6 +331,22 @@ class TestGetSiteSequenceContexts:
             == "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE"
         )
 
+    def test_get_site_sequence_contexts_custom_context(self, proteinSequences):
+        """Test the _get_site_sequence_contexts function with two isoforms with the identical site sequence context.
+
+        Args:
+            proteinSequences: dictionary of UniProt identifiers to protein sequences
+
+        """
+        site_position_string = "Q86U42-2_S19;Q86U42_S19"
+
+        assert (
+            pa._get_site_sequence_contexts(
+                site_position_string, proteinSequences, context_left=5, context_right=4
+            )
+            == "AGGRGsGPGR"
+        )
+
     def test_get_site_sequence_contexts_all_potential_sites(
         self, proteinSequencesExtraPhospho
     ):
@@ -293,3 +373,64 @@ class TestGetSiteSequenceContexts:
         sitePosString = "Q86U42_S19"
 
         assert pa._get_site_sequence_contexts(sitePosString, proteinSequences) == ""
+
+
+class TestAddModificationToSequenceContext:
+    def test_same_position(self):
+        result = pa._add_modification_to_sequence_context(
+            "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG",
+            "Q86U42-2_S19",
+            "Q86U42-2_T20",
+            15,
+        )
+        assert result == "AAAAAAAAGAAGGRGstYGPGRRRHLVPGAG"
+
+    def test_different_protein(self):
+        result = pa._add_modification_to_sequence_context(
+            "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG",
+            "Q86U42-2_S19",
+            "Q86U42_T20",
+            15,
+        )
+        assert result == "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG"
+
+    def test_before_context(self):
+        result = pa._add_modification_to_sequence_context(
+            "AGGRGsTYGPG",
+            "Q86U42-2_S19",
+            "Q86U42-2_T13",
+            5,
+        )
+        assert result == "AGGRGsTYGPG"
+
+    def test_after_context(self):
+        result = pa._add_modification_to_sequence_context(
+            "AGGRGsTYGPG",
+            "Q86U42-2_S19",
+            "Q86U42-2_T25",
+            5,
+        )
+        assert result == "AGGRGsTYGPG"
+
+    def test_wrong_amino_acid(self):
+        with pytest.raises(ValueError, match="Incorrect modified amino acid at position"):
+            pa._add_modification_to_sequence_context(
+                "AGGRGsTYGPG",
+                "Q86U42-2_S19",
+                "Q86U42-2_T24",
+                5,
+            )
+
+
+class TestUnpackSitePositionString:
+    def test_valid_format(self):
+        result = pa._unpack_site_position_string("protein1_S5")
+        assert result == ("protein1", 4, "s")
+
+    def test_invalid_format(self):
+        with pytest.raises(ValueError, match="Invalid format for site_position_string"):
+            pa._unpack_site_position_string("invalid_string")
+            
+
+
+# You may need to adjust the imports and module names based on your actual module structure.
