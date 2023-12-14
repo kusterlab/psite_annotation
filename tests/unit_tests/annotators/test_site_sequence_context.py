@@ -168,12 +168,8 @@ class TestSiteSequenceContextAnnotator:
 
         # Assert that the output dataframe has the expected columns
         assert set(output_df.columns) == {
-            "Proteins",
-            "Modified sequence",
-            "Matched proteins",
-            "Start positions",
-            "End positions",
             "Site positions",
+            "Site sequence context",
         }
 
         # Assert that the output dataframe has the expected values

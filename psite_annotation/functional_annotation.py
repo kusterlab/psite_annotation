@@ -54,6 +54,7 @@ def addPeptideAndPsitePositions(
     fastaFile: str,
     pspInput: bool = False,
     returnAllPotentialSites: bool = False,
+    **kwargs,
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
 
@@ -72,6 +73,7 @@ def addPeptideAndPsitePositions(
         fastaFile: fasta file containing protein sequences
         pspInput: set to True if fasta file was obtained from PhosphositePlus
         returnAllPotentialSites: set to True if all S, T and Y positions should be returned as potention p-sites.
+        **kwargs: arbitrary keyword arguments for SiteSequenceContextAnnotator.annotate()
 
     Returns:
         pd.DataFrame: annotated dataframe
@@ -85,13 +87,13 @@ def addPeptideAndPsitePositions(
 
     annotator = annotators.SiteSequenceContextAnnotator(fastaFile, pspInput)
     annotator.load_annotations()
-    df = annotator.annotate(df)
+    df = annotator.annotate(df, **kwargs)
 
     return df
 
 
 def addSiteSequenceContext(
-    df: pd.DataFrame, fastaFile: str, pspInput: bool = False
+    df: pd.DataFrame, fastaFile: str, pspInput: bool = False, **kwargs
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with sequence context of a p-site.
 
@@ -102,6 +104,7 @@ def addSiteSequenceContext(
         df: pandas dataframe with 'Site positions' column
         fastaFile: fasta file containing protein sequences
         pspInput: set to True if fasta file was obtained from PhosphositePlus
+        **kwargs: arbitrary keyword arguments for SiteSequenceContextAnnotator.annotate()
 
     Returns:
         pd.DataFrame: annotated dataframe
@@ -109,7 +112,7 @@ def addSiteSequenceContext(
     """
     annotator = annotators.SiteSequenceContextAnnotator(fastaFile, pspInput)
     annotator.load_annotations()
-    df = annotator.annotate(df)
+    df = annotator.annotate(df, **kwargs)
 
     return df
 
