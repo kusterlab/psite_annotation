@@ -1,5 +1,9 @@
-main
+v0.5.0
 - Allow multiple peptide matches per protein in PeptidePositionAnnotator
+- Allow for localization uncertainty, Fixes #3
+- Sequence context enhancements, Fixes #1
+- Allow pandas 2.0
+- Add checks for missing input columns
 
 v0.4.0
 - Added Kinase Library scoring
