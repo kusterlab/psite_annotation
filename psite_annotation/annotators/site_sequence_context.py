@@ -44,7 +44,9 @@ class SiteSequenceContextAnnotator:
             self.protein_sequences[proteinId] = seq
 
     @check_columns(["Site positions"])
-    def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
+    def annotate(
+        self, df: pd.DataFrame, inplace: bool = False, **kwargs
+    ) -> pd.DataFrame:
         """Adds columns regarding the peptide position within the protein to a pandas dataframe.
 
         Adds the following annotation columns to dataframe:
@@ -52,6 +54,8 @@ class SiteSequenceContextAnnotator:
 
         Args:
             df: pandas dataframe to be annotated which contains a column "Site positions"
+            inplace: add the new column in place
+            **kwargs: arbitrary keyword arguments.
 
         Returns:
             pd.DataFrame: annotated dataframe
@@ -62,33 +66,38 @@ class SiteSequenceContextAnnotator:
             annotated_df = df.copy()
 
         annotated_df["Site sequence context"] = annotated_df["Site positions"].apply(
-            lambda x: _get_site_sequence_contexts(x, self.protein_sequences)
+            lambda x: _get_site_sequence_contexts(x, self.protein_sequences, **kwargs)
         )
         return annotated_df
 
 
 def _get_site_sequence_contexts(
-    site_position_string: str, protein_sequences: Dict[str, str]
+    site_position_string: str, protein_sequences: Dict[str, str], **kwargs
 ) -> str:
     if len(site_position_string) == 0:
         return ""
 
     site_position_strings = site_position_string.split(";")
     contexts = map(
-        lambda x: _get_site_sequence_context(x, protein_sequences),
+        lambda x: _get_site_sequence_context(x, protein_sequences, **kwargs),
         site_position_strings,
     )
     return ";".join(sorted(set(contexts)))
 
 
 def _get_site_sequence_context(
-    site_position_string: str, protein_sequences: Dict[str, str]
+    site_position_string: str,
+    protein_sequences: Dict[str, str],
+    context_left: int = 15,
+    context_right: int = 15,
 ) -> str:
     """Get sequence context with +/-15 amino acids around the modification site.
 
     Args:
         site_position_string: UniProt protein identifier with its modified amino acid and position, e.g. Q86U42_S19
         protein_sequences: dictionary of UniProt protein identifiers to protein sequence
+        context_left: number of amino acids to the left of the modification to include
+        context_right: number of amino acids to the right of the modification to include
 
     Returns:
         str: sequence context with +/-15 amino acids around the modification site
@@ -104,15 +113,15 @@ def _get_site_sequence_context(
     ):
         return ""
 
-    contextStart = sitePos - 15
-    contextEnd = sitePos + 16
-    if sitePos - 15 < 0:
+    contextStart = sitePos - context_left
+    contextEnd = sitePos + context_right + 1
+    if sitePos - context_left < 0:
         contextStart = 0
-        prefix = "_" * (15 - sitePos)
+        prefix = "_" * (context_left - sitePos)
 
-    if sitePos + 16 > proteinLength:
+    if sitePos + context_right + 1 > proteinLength:
         contextEnd = proteinLength
-        suffix = "_" * (16 + sitePos - proteinLength)
+        suffix = "_" * (context_right + 1 + sitePos - proteinLength)
     return (
         prefix
         + protein_sequences[proteinId][contextStart:sitePos]

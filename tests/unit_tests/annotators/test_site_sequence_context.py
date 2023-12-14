@@ -1,12 +1,12 @@
+import collections
 import unittest
 import unittest.mock
-import collections
 
-import pytest
 import pandas as pd
-from psite_annotation.annotators.annotator_base import MissingColumnsError
+import pytest
 
 import psite_annotation.annotators.site_sequence_context as pa
+from psite_annotation.annotators.annotator_base import MissingColumnsError
 
 # Define the mock input file as a string
 mock_input_file = """>tr|E9PL77|E9PL77_HUMAN Uncharacterized protein
@@ -34,7 +34,7 @@ LRITTRKTPCGEGSKTWDRFQMRIHKRLIDLHSPSEIVKQITSISIEPGVEVEVTIADA
 MADEATRRVVSEIPVLKTNAGPRDRELWVQRLKEEYQSLIRYVENNKNADNDWFRLESNK
 EGTRWFGKCWYIHDLLKYEFDIEFDIPITYPTTAPEIAVPELDGKTAKMYRGGKICLTDH
 FKPLWARNVPKFGLAHLMALGLGPWLAVEIPDLIQKGVIQHKEKCNQ
-"""
+"""  # noqa: E501, B950
 
 
 @pytest.fixture
@@ -115,7 +115,7 @@ class TestSiteSequenceContextAnnotator:
         create=True,
     )
     def test_load_annotations(self, annotator):
-        """Test that the load_annotations method correctly loads the annotations from the input file into `protein_sequences`.
+        """Test that load_annotations method loads annotations from the input file into `protein_sequences`.
 
         Args:
             annotator: Annotator object with mock file loaded
@@ -133,12 +133,12 @@ class TestSiteSequenceContextAnnotator:
         create=True,
     )
     def test_load_annotations_psp(self, annotator_psp):
-        """Test that the load_annotations method correctly loads the annotations from the input file into `protein_sequences`.
+        """Test that load_annotations method loads annotations from the input file into `protein_sequences`.
 
         The PSP fasta reader should ignore non-human sequences.
 
         Args:
-            annotator: Annotator object with mock file loaded
+            annotator_psp: Annotator object with mock file loaded
         """
         annotator_psp.load_annotations()
 
@@ -184,13 +184,11 @@ class TestSiteSequenceContextAnnotator:
         new=unittest.mock.mock_open(read_data=mock_input_file),
         create=True,
     )
-    def test_annotate(self, annotator, input_df, expected_output_df):
-        """Test that the annotate method correctly adds the motif annotations to the input dataframe as new column.
+    def test_annotate_missing_site_positions_column(self, annotator):
+        """Test that the annotate method correctly raises an error if Site positions column is missing.
 
         Args:
             annotator: Annotator object with mock file loaded
-            input_df: Example input dataframe
-            expected_output_df: Expected output dataframe
 
         """
         annotator.load_annotations()
@@ -265,6 +263,22 @@ class TestGetSiteSequenceContexts:
         assert (
             pa._get_site_sequence_contexts(site_position_string, proteinSequences)
             == "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE"
+        )
+
+    def test_get_site_sequence_contexts_custom_context(self, proteinSequences):
+        """Test the _get_site_sequence_contexts function with two isoforms with the identical site sequence context.
+
+        Args:
+            proteinSequences: dictionary of UniProt identifiers to protein sequences
+
+        """
+        site_position_string = "Q86U42-2_S19;Q86U42_S19"
+
+        assert (
+            pa._get_site_sequence_contexts(
+                site_position_string, proteinSequences, context_left=5, context_right=4
+            )
+            == "AGGRGsGPGR"
         )
 
     def test_get_site_sequence_contexts_all_potential_sites(
