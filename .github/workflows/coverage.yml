@@ -21,10 +21,9 @@ jobs:
       uses: abatilo/actions-poetry@v2.0.0
       with:
         poetry-version: ${{ matrix.poetry-version }}
-    - name: Installing package
-      run: poetry install
     - name: Generate coverage report
       run: |
+        poetry install
         pip install pytest
         pip install pytest-cov
         pytest --cov=psite_annotation --cov-report xml --cov-report term -s tests/unit_tests
