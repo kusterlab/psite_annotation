@@ -1,6 +1,7 @@
 import collections
 import itertools
 import re
+from typing import Dict
 
 import pandas as pd
 
@@ -46,6 +47,7 @@ class PeptidePositionAnnotator:
         annotation_file: str,
         pspInput: bool = False,
         returnAllPotentialSites: bool = False,
+        localization_uncertainty: int = 0,
         mod_regex=MOD_REGEX,
         mod_pattern=MOD_PATTERN,
     ):
@@ -55,7 +57,8 @@ class PeptidePositionAnnotator:
         Args:
             annotation_file: fasta file containing protein sequences
             pspInput: set to True if fasta file was obtained from PhosphositePlus
-            returnAllPotentialSites: set to True if all S, T and Y positions should be returned as potention p-sites.
+            returnAllPotentialSites: return all modifiable positions within the peptide as potential p-sites.
+            localization_uncertainty: return all modifiable positions within n positions of modified sites as potential p-sites.
             mod_regex: regex to capture all modification strings
             mod_pattern: regex to capture all single letter modifications
 
@@ -63,6 +66,7 @@ class PeptidePositionAnnotator:
         self.annotation_file = annotation_file
         self.pspInput = pspInput
         self.returnAllPotentialSites = returnAllPotentialSites
+        self.localization_uncertainty = localization_uncertainty
         self.protein_sequences = None
         self.mod_regex = mod_regex
         self.mod_pattern = mod_pattern
@@ -116,6 +120,7 @@ class PeptidePositionAnnotator:
                 self.protein_sequences,
                 x["Modified sequence"],
                 self.returnAllPotentialSites,
+                self.localization_uncertainty,
                 self.mod_regex,
                 self.mod_pattern,
             ),
@@ -130,10 +135,11 @@ def _make_maxquant_mods_consistent(text, mod_regex=MOD_REGEX):
 
 
 def _get_peptide_positions(
-    proteinIds,
-    protein_sequences,
-    mod_peptide_sequence,
-    returnAllPotentialSites=False,
+    proteinIds: str,
+    protein_sequences: Dict[str, str],
+    mod_peptide_sequence: str,
+    returnAllPotentialSites: bool = False,
+    localization_uncertainty: int = 0,
     mod_regex=MOD_REGEX,
     mod_pattern=MOD_PATTERN,
 ):
@@ -144,13 +150,17 @@ def _get_peptide_positions(
         mod_peptide_sequence, mod_regex
     )
 
+    if localization_uncertainty > 0:
+        mod_peptide_sequence = _apply_localization_uncertainty(
+            mod_peptide_sequence, localization_uncertainty
+        )
+
     if returnAllPotentialSites:
-        mod_peptide_sequence = (
-            mod_peptide_sequence.replace("S", "s")
-            .replace("T", "t")
-            .replace("Y", "y")
-            .replace("K", "k")
-            .replace("c", "C")
+        mod_peptide_sequence = re.sub(
+            r"[STYK]", lambda x: x.group().lower(), mod_peptide_sequence
+        )
+        mod_peptide_sequence = re.sub(
+            r"[c]", lambda x: x.group().upper(), mod_peptide_sequence
         )
 
     matchedProteins, startPositions, endPositions, proteinPositions = (
@@ -257,3 +267,22 @@ def _read_fasta_phosphositeplus(file_path, parse_id=lambda x: x.split("|")[3]):
                         name = False
             else:
                 seq.append(line)
+
+
+def _apply_localization_uncertainty(
+    mod_peptide_sequence: str, localization_uncertainty: int
+) -> str:
+    mod_positions = [idx for idx, aa in enumerate(mod_peptide_sequence) if aa.islower()]
+    potential_mod_positions = [
+        idx + x
+        for idx in mod_positions
+        for x in range(localization_uncertainty * -1, localization_uncertainty + 1)
+    ]
+    return "".join(
+        [
+            aa.lower()
+            if aa in ["S", "T", "Y", "K"] and x in potential_mod_positions
+            else aa
+            for x, aa in enumerate(mod_peptide_sequence)
+        ]
+    )

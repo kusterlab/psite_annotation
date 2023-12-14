@@ -77,6 +77,26 @@ class TestAddPsitePositions:
             == "MAAsDTERDGLAPEKtSPDRDKKKEQSEVSV;____________MAAsDTERDGLAPEKtSPD"
         )
 
+    def test_addPeptideAndPsitePositions_localization_uncertainty(self, curves_df):
+        curves_df = pa.addPeptideAndPsitePositions(
+            curves_df, fastaFile, localization_uncertainty=3
+        )
+        # print(curves_df.head())
+
+        assert (
+            curves_df[curves_df["Modified sequence"] == "(ac)AAAMDVDT(ph)PSGTNSGAGK"][
+                "Site positions"
+            ].values[0]
+            == "P62877_S11;P62877_T9"
+        )
+
+        assert (
+            curves_df[curves_df["Modified sequence"] == "(ac)AAAMDVDT(ph)PSGTNSGAGK"][
+                "Site sequence context"
+            ].values[0]
+            == "_____MAAAMDVDTPsGTNSGAGKKRFEVKK;_______MAAAMDVDtPSGTNSGAGKKRFEV"
+        )
+
     def test_addPeptideAndPsitePositionsPSP(self, curves_df):
         curves_df = pa.addPeptideAndPsitePositions(
             curves_df, pa.pspFastaFile, pspInput=True
