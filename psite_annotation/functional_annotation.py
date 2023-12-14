@@ -54,6 +54,7 @@ def addPeptideAndPsitePositions(
     fastaFile: str,
     pspInput: bool = False,
     returnAllPotentialSites: bool = False,
+    localization_uncertainty: int = 0,
     context_left: int = 15,
     context_right: int = 15,
     retain_other_mods: bool = False,
@@ -74,7 +75,8 @@ def addPeptideAndPsitePositions(
         df: pandas dataframe with "Proteins" and "Modified sequence" columns
         fastaFile: fasta file containing protein sequences
         pspInput: set to True if fasta file was obtained from PhosphositePlus
-        returnAllPotentialSites: set to True if all S, T and Y positions should be returned as potention p-sites.
+        returnAllPotentialSites: return all modifiable positions within the peptide as potential p-sites.
+        localization_uncertainty: return all modifiable positions within n positions of modified sites as potential p-sites.
         context_left: number of amino acids to the left of the modification to include
         context_right: number of amino acids to the right of the modification to include
         retain_other_mods: retain other modifications from the modified peptide in the sequence context in lower case
@@ -84,7 +86,10 @@ def addPeptideAndPsitePositions(
 
     """
     peptide_position_annotator = annotators.PeptidePositionAnnotator(
-        fastaFile, pspInput, returnAllPotentialSites
+        fastaFile,
+        pspInput=pspInput,
+        returnAllPotentialSites=returnAllPotentialSites,
+        localization_uncertainty=localization_uncertainty,
     )
     peptide_position_annotator.load_annotations()
     df = peptide_position_annotator.annotate(df)

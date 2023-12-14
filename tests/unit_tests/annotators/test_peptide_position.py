@@ -430,3 +430,25 @@ class TestGetPeptidePositions:
             "25;25",
             "Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21;Q86U42_S19;Q86U42_T20;Q86U42_Y21",
         )
+
+
+class TestApplyLocalizationUncertainty:
+    def test_apply_localization_uncertainty_no_change(self):
+        result = pa._apply_localization_uncertainty("THEPEPtPIDE", 1)
+        assert result == "THEPEPtPIDE"
+
+    def test_apply_localization_uncertainty_one_change(self):
+        result = pa._apply_localization_uncertainty("THEPYPtSTDE", 1)
+        assert result == "THEPYPtsTDE"
+
+    def test_apply_localization_uncertainty_zero_uncertainty(self):
+        result = pa._apply_localization_uncertainty("THEPEPtSIDE", 0)
+        assert result == "THEPEPtSIDE"
+
+    def test_apply_localization_uncertainty_mixed_sequence(self):
+        result = pa._apply_localization_uncertainty("THEPETtsIDE", 1)
+        assert result == "THEPEttsIDE"
+
+    def test_apply_localization_uncertainty_empty_sequence(self):
+        result = pa._apply_localization_uncertainty("", 1)
+        assert result == ""
