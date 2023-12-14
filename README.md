@@ -3,7 +3,7 @@
 [![PyPI version](https://img.shields.io/pypi/v/psite-annotation.svg?logo=pypi&logoColor=FFE873)](https://pypi.org/project/psite-annotation/)
 [![Supported Python versions](https://img.shields.io/pypi/pyversions/psite-annotation.svg?logo=python&logoColor=FFE873)](https://pypi.org/project/psite-annotation/)
 [![PyPI downloads](https://img.shields.io/pypi/dm/psite-annotation.svg)](https://pypistats.org/packages/psite-annotation)
-
+[![Codecov](https://codecov.io/gh/kusterlab/psite_annotation/branch/main/graph/badge.svg)](https://codecov.io/gh/kusterlab/psite_annotation)
 
 Python module for annotating a pandas dataframe with phosphosites, e.g. PhosphoSitePlus annotations, kinase-substrate relations, domain information, etc.
 
