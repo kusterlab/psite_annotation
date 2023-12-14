@@ -1,4 +1,4 @@
-name: Codecov workflow
+name: Unit tests
 on: [push]
 jobs:
   run:
