@@ -373,3 +373,64 @@ class TestGetSiteSequenceContexts:
         sitePosString = "Q86U42_S19"
 
         assert pa._get_site_sequence_contexts(sitePosString, proteinSequences) == ""
+
+
+class TestAddModificationToSequenceContext:
+    def test_same_position(self):
+        result = pa._add_modification_to_sequence_context(
+            "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG",
+            "Q86U42-2_S19",
+            "Q86U42-2_T20",
+            15,
+        )
+        assert result == "AAAAAAAAGAAGGRGstYGPGRRRHLVPGAG"
+
+    def test_different_protein(self):
+        result = pa._add_modification_to_sequence_context(
+            "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG",
+            "Q86U42-2_S19",
+            "Q86U42_T20",
+            15,
+        )
+        assert result == "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG"
+
+    def test_before_context(self):
+        result = pa._add_modification_to_sequence_context(
+            "AGGRGsTYGPG",
+            "Q86U42-2_S19",
+            "Q86U42-2_T13",
+            5,
+        )
+        assert result == "AGGRGsTYGPG"
+
+    def test_after_context(self):
+        result = pa._add_modification_to_sequence_context(
+            "AGGRGsTYGPG",
+            "Q86U42-2_S19",
+            "Q86U42-2_T25",
+            5,
+        )
+        assert result == "AGGRGsTYGPG"
+
+    def test_wrong_amino_acid(self):
+        with pytest.raises(ValueError, match="Incorrect modified amino acid at position"):
+            pa._add_modification_to_sequence_context(
+                "AGGRGsTYGPG",
+                "Q86U42-2_S19",
+                "Q86U42-2_T24",
+                5,
+            )
+
+
+class TestUnpackSitePositionString:
+    def test_valid_format(self):
+        result = pa._unpack_site_position_string("protein1_S5")
+        assert result == ("protein1", 4, "s")
+
+    def test_invalid_format(self):
+        with pytest.raises(ValueError, match="Invalid format for site_position_string"):
+            pa._unpack_site_position_string("invalid_string")
+            
+
+
+# You may need to adjust the imports and module names based on your actual module structure.

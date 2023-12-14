@@ -56,6 +56,7 @@ def addPeptideAndPsitePositions(
     returnAllPotentialSites: bool = False,
     context_left: int = 15,
     context_right: int = 15,
+    retain_other_mods: bool = False,
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
 
@@ -76,6 +77,7 @@ def addPeptideAndPsitePositions(
         returnAllPotentialSites: set to True if all S, T and Y positions should be returned as potention p-sites.
         context_left: number of amino acids to the left of the modification to include
         context_right: number of amino acids to the right of the modification to include
+        retain_other_mods: retain other modifications from the modified peptide in the sequence context in lower case
 
     Returns:
         pd.DataFrame: annotated dataframe
@@ -92,6 +94,7 @@ def addPeptideAndPsitePositions(
         pspInput=pspInput,
         context_left=context_left,
         context_right=context_right,
+        retain_other_mods=retain_other_mods,
     )
     annotator.load_annotations()
     df = annotator.annotate(df)
@@ -105,6 +108,7 @@ def addSiteSequenceContext(
     pspInput: bool = False,
     context_left: int = 15,
     context_right: int = 15,
+    retain_other_mods: bool = False,
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with sequence context of a p-site.
 
@@ -117,6 +121,7 @@ def addSiteSequenceContext(
         pspInput: set to True if fasta file was obtained from PhosphositePlus
         context_left: number of amino acids to the left of the modification to include
         context_right: number of amino acids to the right of the modification to include
+        retain_other_mods: retain other modifications from the modified peptide in the sequence context in lower case
 
     Returns:
         pd.DataFrame: annotated dataframe
@@ -127,6 +132,7 @@ def addSiteSequenceContext(
         pspInput=pspInput,
         context_left=context_left,
         context_right=context_right,
+        retain_other_mods=retain_other_mods,
     )
     annotator.load_annotations()
     df = annotator.annotate(df)
