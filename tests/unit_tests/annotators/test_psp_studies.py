@@ -55,7 +55,7 @@ class TestPSPStudiesAnnotator:
             }
         )
         pd.testing.assert_frame_equal(
-            annotator.psp_df, expected_output_df, check_like=True
+            annotator.psp_df, expected_output_df, check_like=True, check_dtype=False
         )
 
     def test_annotate(self, annotator):

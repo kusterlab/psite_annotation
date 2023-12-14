@@ -27,5 +27,5 @@ flake8-bandit = "^4.1.1"
 darglint = "^1.8.1"
 
 [build-system]
-requires = ["poetry>=0.12"]
+requires = ["poetry>=1.5.1"]
 build-backend = "poetry.masonry.api"
