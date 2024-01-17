@@ -26,7 +26,7 @@ class PSPStudiesAnnotator:
 
     def load_annotations(self) -> None:
         """Reads in tab separated file with PhosphositePlus annotations and stores it as a dictionary."""
-        self.psp_df = pd.read_csv(self.annotation_file, sep="\t", skiprows=3)
+        self.psp_df = pd.read_csv(self.annotation_file, sep="\t", skiprows=3, encoding='utf-8')
 
         self.psp_df = self.psp_df[self.psp_df["ORGANISM"] == "human"]
 

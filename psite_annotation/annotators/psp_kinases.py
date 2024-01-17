@@ -28,7 +28,7 @@ class PSPKinasesAnnotator:
 
     def load_annotations(self) -> None:
         """Reads in tab separated file with PhosphositePlus annotations."""
-        self.psp_df = pd.read_csv(self.annotation_file, sep="\t", skiprows=3)
+        self.psp_df = pd.read_csv(self.annotation_file, sep="\t", skiprows=3, encoding='utf-8')
         self.psp_df = self.psp_df[
             (self.psp_df["KIN_ORGANISM"] == "human")
             & (self.psp_df["SUB_ORGANISM"] == "human")

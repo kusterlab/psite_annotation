@@ -20,7 +20,7 @@ pip install psite-annotation
 Otherwise, you can clone this repository and install it with pip manually:
 
 ```
-git clone https://www.github.com/kusterlab/psite_annotation.git
+git clone https://github.com/kusterlab/psite_annotation.git
 cd psite_annotation
 pip install .
 ```
