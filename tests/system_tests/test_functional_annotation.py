@@ -110,6 +110,26 @@ class TestAddPsitePositions:
             == "P62877_T9"
         )
 
+    def test_addPeptideAndPsitePositions_custom_mod_dict(self, curves_df):
+        curves_df = pa.addPeptideAndPsitePositions(
+            curves_df, fastaFile, mod_dict={"(ac)A": "a"}
+        )
+        # print(curves_df.head())
+
+        assert (
+            curves_df[curves_df["Modified sequence"] == "(ac)AAAMDVDT(ph)PSGTNSGAGK"][
+                "Site positions"
+            ].values[0]
+            == "P62877_A2"
+        )
+
+        assert (
+            curves_df[curves_df["Modified sequence"] == "(ac)AAAMDVDT(ph)PSGTNSGAGK"][
+                "Site sequence context"
+            ].values[0]
+            == "______________MaAAMDVDTPSGTNSGA"
+        )
+
 
 class TestAddPSPAnnotations:
     def test_addPSPAnnotations(self, curves_df):

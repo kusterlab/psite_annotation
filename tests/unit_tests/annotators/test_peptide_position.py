@@ -315,7 +315,7 @@ class TestGetPeptidePositions:
 
         """
         proteinIds = "Q86U42-X"
-        modPeptideSequence = "(ac)AAAAAAAAAAGAAGGRGS(ph)GPGR"
+        modPeptideSequence = "(ac)AAAAAA(random mod(with extra parentheses))AAAAGAAGGRGS(ph)GPGR"
 
         assert pa._get_peptide_positions(
             proteinIds, proteinSequences, modPeptideSequence
@@ -434,21 +434,57 @@ class TestGetPeptidePositions:
 
 class TestApplyLocalizationUncertainty:
     def test_apply_localization_uncertainty_no_change(self):
-        result = pa._apply_localization_uncertainty("THEPEPtPIDE", 1)
+        result = pa._apply_localization_uncertainty("THEPEPtPIDE", 1, "sty")
         assert result == "THEPEPtPIDE"
 
     def test_apply_localization_uncertainty_one_change(self):
-        result = pa._apply_localization_uncertainty("THEPYPtSTDE", 1)
+        result = pa._apply_localization_uncertainty("THEPYPtSTDE", 1, "sty")
         assert result == "THEPYPtsTDE"
 
     def test_apply_localization_uncertainty_zero_uncertainty(self):
-        result = pa._apply_localization_uncertainty("THEPEPtSIDE", 0)
+        result = pa._apply_localization_uncertainty("THEPEPtSIDE", 0, "sty")
         assert result == "THEPEPtSIDE"
 
     def test_apply_localization_uncertainty_mixed_sequence(self):
-        result = pa._apply_localization_uncertainty("THEPETtsIDE", 1)
+        result = pa._apply_localization_uncertainty("THEPETtsIDE", 1, "sty")
         assert result == "THEPEttsIDE"
 
+    def test_apply_localization_uncertainty_start_of_sequence(self):
+        result = pa._apply_localization_uncertainty("tHEPETTSIDE", 5, "sty")
+        assert result == "tHEPEtTSIDE"
+
     def test_apply_localization_uncertainty_empty_sequence(self):
-        result = pa._apply_localization_uncertainty("", 1)
+        result = pa._apply_localization_uncertainty("", 1, "sty")
         assert result == ""
+
+
+class TestRemoveModifications:
+    def test_remove_modifications_simple(self):
+        peptide_sequence = "THEP(Acetyl)TIDE"
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == "THEPTIDE"
+
+    def test_remove_modifications_nested(self):
+        peptide_sequence = "THEP(Acetyl(Methyl(Oxidation)))TIDE"
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == "THEPTIDE"
+
+    def test_remove_modifications_multiple_modifications(self):
+        peptide_sequence = "THEP(Acetyl)TID(E)MOD"
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == "THEPTIDMOD"
+
+    def test_remove_modifications_no_modifications(self):
+        peptide_sequence = "THEPTIDE"
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == "THEPTIDE"
+
+    def test_remove_modifications_empty_input(self):
+        peptide_sequence = ""
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == ""
+
+    def test_remove_modifications_only_modifications(self):
+        peptide_sequence = "(Acetyl)"
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == ""

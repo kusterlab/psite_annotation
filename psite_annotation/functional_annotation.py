@@ -1,5 +1,6 @@
 import logging
 import sys
+from typing import Dict
 
 import pandas as pd
 
@@ -58,6 +59,7 @@ def addPeptideAndPsitePositions(
     context_left: int = 15,
     context_right: int = 15,
     retain_other_mods: bool = False,
+    mod_dict: Dict[str, str] = None,
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
 
@@ -80,16 +82,21 @@ def addPeptideAndPsitePositions(
         context_left: number of amino acids to the left of the modification to include
         context_right: number of amino acids to the right of the modification to include
         retain_other_mods: retain other modifications from the modified peptide in the sequence context in lower case
+        mod_dict: dictionary of modifications to single amino acid replacements, e.g. {"S(ph)": "s", "T(ph)": "t", "Y(ph)": "y"}
 
     Returns:
         pd.DataFrame: annotated dataframe
 
     """
+    if mod_dict is None:
+        mod_dict = annotators.peptide_position.MOD_DICT
+    
     peptide_position_annotator = annotators.PeptidePositionAnnotator(
         fastaFile,
         pspInput=pspInput,
         returnAllPotentialSites=returnAllPotentialSites,
         localization_uncertainty=localization_uncertainty,
+        mod_dict=mod_dict,
     )
     peptide_position_annotator.load_annotations()
     df = peptide_position_annotator.annotate(df)
