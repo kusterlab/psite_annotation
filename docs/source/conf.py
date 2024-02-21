@@ -28,6 +28,7 @@ extensions = [
     'sphinx_autodoc_typehints',
 ]
 
+autodoc_mock_imports = ['pandas', 'numpy', 'scipy', 'config-path']
 autosummary_generate = True
 
 templates_path = ['_templates']
