@@ -7,6 +7,8 @@
 .. autosummary::
    :toctree: _autosummary
    :template: custom-module-template.rst
-   :recursive:
 
    psite_annotation
+   psite_annotation.annotators
+   
+

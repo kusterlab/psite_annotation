@@ -4,11 +4,14 @@ from .functional_annotation import *  # noqa: F401,F403
 
 __version__ = "0.0.0"
 try:
-    from importlib.metadata import PackageNotFoundError, version
+    from importlib.metadata import (
+        PackageNotFoundError as _PackageNotFoundError,
+        version as _version,
+    ) # making import aliases private prevents sphinx-autodoc from listing them
 
     try:
-        __version__ = version(__name__)
-    except PackageNotFoundError:
+        __version__ = _version(__name__)
+    except _PackageNotFoundError:
         pass
 except ImportError:
     from pkg_resources import DistributionNotFound, get_distribution

@@ -12,7 +12,8 @@ Welcome to Psite annotation's documentation!
    :caption: Contents:
 
    Home page <self>
-   API reference <_autosummary/psite_annotation>
+   Annotator functions <_autosummary/psite_annotation>
+   Annotator classes <_autosummary/psite_annotation.annotators>
 
 
 

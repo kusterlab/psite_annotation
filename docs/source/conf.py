@@ -11,28 +11,36 @@ sys.path.insert(0, os.path.abspath("../.."))
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
-project = 'Psite annotation'
-copyright = '2024, Matthew The'
-author = 'Matthew The'
-release = '0.5.0'
+project = "Psite annotation"
+copyright = "2024, Matthew The"
+author = "Matthew The"
+release = "0.5.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
 extensions = [
-    'sphinx.ext.duration',
-    'sphinx.ext.doctest',
-    'sphinx.ext.autodoc',
-    'sphinx.ext.autosummary',
-    'sphinx.ext.napoleon',
-    'sphinx_autodoc_typehints',
+    "sphinx.ext.duration",
+    "sphinx.ext.doctest",
+    "sphinx.ext.autodoc",
+    "sphinx.ext.autosummary",
+    "sphinx.ext.napoleon",
+    "sphinx_autodoc_typehints",
 ]
 
-autodoc_mock_imports = ['pandas', 'numpy', 'scipy']
+autodoc_mock_imports = [
+    "pandas",
+    "numpy",
+    "scipy",
+]
 autosummary_generate = True
+autosummary_ignore_module_all = False
+autosummary_imported_members = True
 
-templates_path = ['_templates']
+templates_path = ["_templates"]
 exclude_patterns = []
+
+toc_object_entries = False
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -40,9 +48,12 @@ exclude_patterns = []
 
 # -- Options for HTML output
 
-html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
+html_theme = "sphinx_rtd_theme"
+html_static_path = ["_static"]
+
+html_css_files = [
+    "custom.css",
+]
 
 # -- Options for EPUB output
-epub_show_urls = 'footnote'
-
+epub_show_urls = "footnote"
