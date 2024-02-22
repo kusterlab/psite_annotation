@@ -9,15 +9,19 @@
 
 Python module for annotating a pandas dataframe with phosphosites, e.g. PhosphoSitePlus annotations, kinase-substrate relations, domain information, etc.
 
+## Documentation
+
+The official Psite annotation documentation can be found at https://psite-annotation.readthedocs.io.
+
 ## Installation
 
-If you have setup SSH keys in gitlab, you can easily install this package with:
+You can easily install this package with `pip`:
 
 ```
 pip install psite-annotation
 ```
 
-Otherwise, you can clone this repository and install it with pip manually:
+Alternatively, you can clone this repository and install it with pip manually:
 
 ```
 git clone https://github.com/kusterlab/psite_annotation.git
