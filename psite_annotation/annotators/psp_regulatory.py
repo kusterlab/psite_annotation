@@ -7,10 +7,12 @@ from .separated_strings import combine_separated_strings, merge_on_separated_str
 class PSPRegulatoryAnnotator:
     """Annotate pandas dataframe with regulatory functions according to PhosphositePlus.
 
-    Typical usage example:
-      annotator = PSPRegulatoryAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+
+            annotator = PSPRegulatoryAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(self, annotation_file: str):
@@ -60,7 +62,8 @@ class PSPRegulatoryAnnotator:
     def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
         """Adds columns with number of studies.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+        
         - PSP_ON_FUNCTION = functional annotations for downstream regulation
         - PSP_ON_PROCESS = process annotations for downstream regulation
         - PSP_ON_PROT_INTERACT = protein interactions

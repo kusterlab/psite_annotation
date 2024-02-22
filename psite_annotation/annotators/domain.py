@@ -13,10 +13,12 @@ class DomainAnnotator:
     Requires 'Matched proteins', 'Start positions', 'End positions' columns in the dataframe to be annotated.
     The 'Matched proteins', 'Start positions', 'End positions' columns can be generated with PeptidePositionAnnotator().
 
-    Typical usage example:
-      annotator = DomainAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+
+            annotator = DomainAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(self, annotation_file: Union[str, IO]):
@@ -48,7 +50,8 @@ class DomainAnnotator:
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds column with domains the peptide overlaps with.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+        
         - Domains = semicolon separated list of domains that overlap with the peptide
 
         Args:

@@ -23,10 +23,12 @@ MOD_DICT = {
 class PeptidePositionAnnotator:
     """Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
 
-    Typical usage example:
-      annotator = PeptidePositionAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+
+            annotator = PeptidePositionAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(
@@ -69,7 +71,8 @@ class PeptidePositionAnnotator:
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds columns regarding the peptide position within the protein to a pandas dataframe.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+        
         - 'Matched proteins' = subset of 'Proteins' in the input column in which the protein could indeed be found. If
           the same peptide is found multiple times, the protein identifier will be repeated.
         - 'Start positions' = starting positions of the modified peptide in the protein sequence (1-based, methionine is

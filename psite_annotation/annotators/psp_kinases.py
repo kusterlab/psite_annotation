@@ -7,10 +7,12 @@ from .separated_strings import combine_separated_strings, merge_on_separated_str
 class PSPKinasesAnnotator:
     """Annotate pandas dataframe with upstream kinases according to PhosphositePlus.
 
-    Typical usage example:
-      annotator = PSPKinasesAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+
+            annotator = PSPKinasesAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(self, annotation_file: str, output_gene_names: bool = False):
@@ -55,7 +57,8 @@ class PSPKinasesAnnotator:
     def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
         """Adds column with phosphorylating kinases.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+        
         - PSP Kinases = all phosphorylating kinases according to PhosphoSitePlus, no distinction is made between
           in vivo and in vitro evidence (this can be added in the future, if necessary)
 

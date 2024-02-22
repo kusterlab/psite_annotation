@@ -1,4 +1,5 @@
 from typing import Protocol
+from functools import wraps
 
 import pandas as pd
 
@@ -24,6 +25,7 @@ class MissingColumnsError(Exception):
 
 def check_columns(columns):
     def decorator(func):
+        @wraps(func)
         def wrapper(*args, **kwargs):
             # Assuming the DataFrame is the first argument
             df = args[1] if args and len(args) > 0 else kwargs.get("df")
@@ -45,6 +47,11 @@ def check_columns(columns):
 
             return func(*args, **kwargs)
 
+        wrapper.__doc__ = f"""{func.__doc__}
+
+        Required columns:
+            {', '.join(columns)}"""
+        
         return wrapper
 
     return decorator

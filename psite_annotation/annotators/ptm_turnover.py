@@ -8,10 +8,12 @@ class PTMTurnoverAnnotator:
 
     https://www.nature.com/articles/s41467-021-27639-0
 
-    Typical usage example:
-      annotator = PTMTurnoverAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+
+            annotator = PTMTurnoverAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(self, annotation_file: str):
@@ -58,7 +60,8 @@ class PTMTurnoverAnnotator:
     def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
         """Adds column regarding the PTM turnover behavior.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+        
         - 'PTM Turnover' = rate of turnover for the modification sites according to Jana's PTM Turnover data
 
         Args:

@@ -15,10 +15,12 @@ class MotifAnnotator:
     Requires "Site sequence context" column in the dataframe to be present.
     The "Site sequence context" column can be generated with PeptidePositionAnnotator().
 
-    Typical usage example:
-      annotator = MotifAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+
+            annotator = MotifAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(self, annotation_file: Union[str, IO]):
@@ -57,7 +59,8 @@ class MotifAnnotator:
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds column with motifs the site sequence context matches with.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+        
         - Motifs = semicolon separated list of motifs that match with the site sequence contexts
 
         Args:

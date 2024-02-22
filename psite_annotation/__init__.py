@@ -1,7 +1,8 @@
-"""Get version from distribution and set copyright."""
+"""Convenience functions for annotating a pandas dataframe with a variety of annotations."""
 
 from .functional_annotation import *  # noqa: F401,F403
 
+"""Get version from distribution and set copyright."""
 __version__ = "0.0.0"
 try:
     from importlib.metadata import (

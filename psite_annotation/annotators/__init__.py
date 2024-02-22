@@ -1,14 +1,18 @@
 # flake8: noqa
 
-"""Import all annotators so they can be imported from the psite_annotation.annotators subpackage.
+"""Classes for annotating pandas dataframes with a variety of annotations.
 
-Typical usage example:
-    from psite_annotation import annotators
+Example:
+    ::
 
-    annotator = annotators.PSPKinasesAnnotator(<path_to_annotation_file>)
-    annotator.load_annotations()
-    df = annotator.annotate(df)
+        from psite_annotation import annotators
+
+        annotator = annotators.PSPKinasesAnnotator(<path_to_annotation_file>)
+        annotator.load_annotations()
+        df = annotator.annotate(df)
 """
+
+# Import all annotators so they can be imported from the psite_annotation.annotators subpackage.
 
 from .clinical_basket import ClinicalBasketAnnotator
 from .domain import DomainAnnotator

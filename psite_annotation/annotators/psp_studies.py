@@ -7,10 +7,12 @@ from .separated_strings import merge_on_separated_string
 class PSPStudiesAnnotator:
     """Annotate pandas dataframe with number of high and low-throughput studies according to PhosphositePlus.
 
-    Typical usage example:
-      annotator = PSPStudiesAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+
+            annotator = PSPStudiesAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(self, annotation_file: str):
@@ -57,7 +59,8 @@ class PSPStudiesAnnotator:
     def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
         """Adds columns with number of studies.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+        
         - LT_LIT = number of low-throughput studies
         - MS_LIT = number of high-throughput Mass Spec studies
         - MS_CST = number of high-throughput Mass Spec studies by CellSignalingTechnologies

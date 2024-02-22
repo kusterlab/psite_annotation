@@ -12,12 +12,14 @@ from .separated_strings import (
 class ClinicalBasketAnnotator:
     """Annotate pandas dataframe with clinical baskets from Annika.
 
-    Require `Gene names` column in the dataframe to be annotated.
+    Requires `Gene names` column in the dataframe to be annotated.
 
-    Typical usage example:
-      annotator = ClinicalBasketAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+
+            annotator = ClinicalBasketAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(self, annotation_file: str):
@@ -34,9 +36,14 @@ class ClinicalBasketAnnotator:
     def load_annotations(self) -> None:
         """Reads in excel file with basket-gene annotations.
 
-        Create a dataframe `basket_df` with two columns:
+        Creates a dataframe `basket_df` with two columns\:
+
         - `Gene names` contains a single gene name
         - `Clinical baskets` contains a semicolon-separated list of basket identifiers the gene is featured in
+
+        Returns:
+            None
+
         """
         self.basket_df = pd.read_excel(self.annotation_file)
         self.basket_df = self.basket_df.rename(
@@ -57,7 +64,8 @@ class ClinicalBasketAnnotator:
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds column with baskets the gene names correspond to.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+        
         - `Clinical baskets` = semicolon separated list of clinical baskets the gene name corresponds to
 
         Args:

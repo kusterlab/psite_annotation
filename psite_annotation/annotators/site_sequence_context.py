@@ -14,10 +14,12 @@ SITE_POSITION_PATTERN = re.compile(r"[a-zA-Z\-0-9]*_[A-Z][0-9]*")
 class SiteSequenceContextAnnotator:
     """Annotate pandas dataframe with +/- 15 amino acids around each of the modified sites, separated by semicolons.
 
-    Typical usage example:
-      annotator = SiteSequenceContextAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+        
+            annotator = SiteSequenceContextAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(
@@ -60,7 +62,8 @@ class SiteSequenceContextAnnotator:
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds columns regarding the peptide position within the protein to a pandas dataframe.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+        
         - 'Site sequence context' = +/- 15 amino acids around each of the modified sites, separated by semicolons
 
         Args:

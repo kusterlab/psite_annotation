@@ -63,7 +63,8 @@ def addPeptideAndPsitePositions(
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
 
-    Adds the following annotation columns to dataframe:
+    Adds the following annotation columns to dataframe\:
+
     - 'Matched proteins' = subset of 'Proteins' in the input column in which the protein could indeed be found. If
         the same peptide is found multiple times in the same protein sequence, the protein identifier will be repeated.
     - 'Start positions' = starting positions of the modified peptide in the protein sequence (1-based, methionine is
@@ -124,7 +125,8 @@ def addSiteSequenceContext(
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with sequence context of a p-site.
 
-    Adds the following annotation columns to dataframe:
+    Adds the following annotation columns to dataframe\:
+
     - 'Site sequence context' = +/- 15 amino acids around each of the modified sites, separated by semicolons
 
     Args:
@@ -157,7 +159,8 @@ def addTurnoverRates(df: pd.DataFrame, turnoverFile: str) -> pd.DataFrame:
 
     Adds column regarding the PTM turnover behavior.
 
-    Adds the following annotation columns to dataframe:
+    Adds the following annotation columns to dataframe\:
+
     - 'PTM Turnover' = rate of turnover for the modification sites according to Jana's PTM Turnover data
 
     Args:
@@ -178,7 +181,8 @@ def addTurnoverRates(df: pd.DataFrame, turnoverFile: str) -> pd.DataFrame:
 def addPSPAnnotations(df: pd.DataFrame, phosphoSitePlusFile: str) -> pd.DataFrame:
     """Annotate pandas dataframe with number of high and low-throughput studies according to PhosphositePlus.
 
-    Adds the following annotation columns to dataframe:
+    Adds the following annotation columns to dataframe\:
+
     - LT_LIT = number of low-throughput studies
     - MS_LIT = number of high-throughput Mass Spec studies
     - MS_CST = number of high-throughput Mass Spec studies by CellSignalingTechnologies
@@ -203,7 +207,8 @@ def addPSPRegulatoryAnnotations(
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with regulatory functions according to PhosphositePlus.
 
-    Adds the following annotation columns to dataframe:
+    Adds the following annotation columns to dataframe\:
+
     - PSP_ON_FUNCTION = functional annotations for downstream regulation
     - PSP_ON_PROCESS = process annotations for downstream regulation
     - PSP_ON_PROT_INTERACT = protein interactions
@@ -230,7 +235,8 @@ def addPSPKinaseSubstrateAnnotations(
 ):
     """Annotate pandas dataframe with upstream kinases according to PhosphositePlus.
 
-    Adds the following annotation columns to dataframe:
+    Adds the following annotation columns to dataframe\:
+
     - PSP Kinases = all phosphorylating kinases according to PhosphoSitePlus, no distinction is made between in vivo
       and in vitro evidence (this can be added in the future, if necessary)
 
@@ -255,7 +261,8 @@ def addPSPKinaseSubstrateAnnotations(
 def addDomains(df: pd.DataFrame, domainMappingFile: str):
     """Adds column with domains the peptide overlaps with.
 
-    Adds the following annotation columns to dataframe:
+    Adds the following annotation columns to dataframe\:
+
     - Domains = semicolon separated list of domains that overlap with the peptide
 
     Args:
@@ -276,7 +283,8 @@ def addDomains(df: pd.DataFrame, domainMappingFile: str):
 def addMotifs(df: pd.DataFrame, motifsFile: str):
     """Adds column with motifs the site sequence context matches with.
 
-    Adds the following annotation columns to dataframe:
+    Adds the following annotation columns to dataframe\:
+
     - Motifs = semicolon separated list of motifs that match with the site sequence contexts
 
     Args:
@@ -299,7 +307,8 @@ def addInVitroKinases(df: pd.DataFrame, inVitroKinaseSubstrateMappingFile: str):
 
     https://www.nature.com/articles/s41598-019-46385-4
 
-    Adds the following annotation columns to dataframe:
+    Adds the following annotation columns to dataframe\:
+
     - In Vitro Kinases = all phosphorylating kinases according to the Sugiyama in vitro kinase-substrate study
 
     Args:
@@ -328,7 +337,8 @@ def addKinaseLibraryAnnotations(
     The "Site sequence context" column can be generated with PeptidePositionAnnotator()
     followed by SiteSequenceContextAnnotator().
 
-    Adds the following annotation columns to dataframe:
+    Adds the following annotation columns to dataframe\:
+    
     - Motif Kinases = semicolon separated list of kinases that match with the site sequence contexts
     - Motif Scores = semicolon separated list of scores corresponding to Motif Kinases
     - Motif Percentiles = semicolon separated list of percentiles corresponding to Motif Kinases
