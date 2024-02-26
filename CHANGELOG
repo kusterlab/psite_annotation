@@ -1,3 +1,9 @@
+v0.5.1
+- Created readthedocs
+- Allow custom dictionary of modifications (#7)
+- Fix for problematic characters in PSP tables (#6)
+- Codecov and unit tests with GitHub Actions (#5)
+
 v0.5.0
 - Allow multiple peptide matches per protein in PeptidePositionAnnotator
 - Allow for localization uncertainty, Fixes #3

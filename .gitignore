@@ -4,3 +4,4 @@ htmlcov
 notebooks
 .pytest_cache
 dist
+data
