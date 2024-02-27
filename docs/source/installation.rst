@@ -6,7 +6,7 @@ Installation
 Prerequisites
 ~~~~~~~~~~~~~
 
-Picked Group FDR requires python >=3.9,<=3.11.
+Psite-annotation requires python >=3.9,<=3.11.
 
 Using pip (recommended)
 ~~~~~~~~~~~~~~~~~~~~~~~
