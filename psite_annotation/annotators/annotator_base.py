@@ -50,7 +50,7 @@ def check_columns(columns):
         wrapper.__doc__ = f"""{func.__doc__}
 
         Required columns:
-            {', '.join(columns)}"""
+            {', '.join(map(lambda x: f':code:`{x}`', columns))}"""
         
         return wrapper
 

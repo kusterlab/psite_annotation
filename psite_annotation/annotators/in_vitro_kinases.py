@@ -11,6 +11,7 @@ class InVitroKinasesAnnotator:
 
     Example:
         ::
+            
             annotator = InVitroKinasesAnnotator(<path_to_annotation_file>)
             annotator.load_annotations()
             df = annotator.annotate(df)

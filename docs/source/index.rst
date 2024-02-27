@@ -6,20 +6,15 @@
 Welcome to Psite annotation's documentation!
 ============================================
 
+Python module for annotating a pandas dataframe with phosphosites, e.g. PhosphoSitePlus annotations, kinase-substrate relations, domain information, etc.
+
 .. toctree::
-   :hidden:
-   :maxdepth: 2
+   :maxdepth: 1
    :caption: Contents:
 
-   Home page <self>
+   installation
+   usage
    Annotator functions <_autosummary/psite_annotation>
    Annotator classes <_autosummary/psite_annotation.annotators>
 
 
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`

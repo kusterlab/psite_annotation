@@ -5,6 +5,7 @@ from typing import Dict
 import pandas as pd
 
 from . import annotators
+from .annotators.annotator_base import check_columns
 from .config import _getConfigDicts, _getConfigSetting
 
 logger = logging.getLogger(__name__)
@@ -65,14 +66,25 @@ def addPeptideAndPsitePositions(
 
     Adds the following annotation columns to dataframe\:
 
-    - 'Matched proteins' = subset of 'Proteins' in the input column in which the protein could indeed be found. If
-        the same peptide is found multiple times in the same protein sequence, the protein identifier will be repeated.
-    - 'Start positions' = starting positions of the modified peptide in the protein sequence (1-based, methionine is
-        counted). If multiple isoforms/proteins contain the sequence, the starting positions are separated by
-        semicolons in the same order as they are listed in the 'Matched proteins' column
+    - 'Matched proteins' = subset of 'Proteins' in the input column in which the protein could indeed be found. If the same peptide is found multiple times in the same protein sequence, the protein identifier will be repeated.
+    - 'Start positions' = starting positions of the modified peptide in the protein sequence (1-based, methionine is counted). If multiple isoforms/proteins contain the sequence, the starting positions are separated by semicolons in the same order as they are listed in the 'Matched proteins' column
     - 'End positions' = end positions of the modified peptide in the protein sequence (see above for details)
-    - 'Site positions' = position of the modification (see 'Start positions' above for details on how the position
-        is counted)
+    - 'Site positions' = position of the modification (see 'Start positions' above for details on how the position is counted)
+    - 'Site sequence context' = +/- 15 amino acids around each of the modified sites, separated by semicolons
+
+    Example:
+        Annotate with psite positions as given by PhosphoSitePlus::
+
+            import psite_annotation as pa
+            df = pa.addPeptideAndPsitePositions(df, pa.pspFastaFile, pspInput = True)
+
+        Annotate a custom modification::
+
+            df = pa.addPeptideAndPsitePositions(df, pa.pspFastaFile, pspInput = True, mod_dict={'R[0.9840]': 'r'})
+
+
+    Required columns:
+        :code:`Proteins`, :code:`Modified sequence`
 
     Args:
         df: pandas dataframe with "Proteins" and "Modified sequence" columns
@@ -83,7 +95,7 @@ def addPeptideAndPsitePositions(
         context_left: number of amino acids to the left of the modification to include
         context_right: number of amino acids to the right of the modification to include
         retain_other_mods: retain other modifications from the modified peptide in the sequence context in lower case
-        mod_dict: dictionary of modifications to single amino acid replacements, e.g. {"S(ph)": "s", "T(ph)": "t", "Y(ph)": "y"}
+        mod_dict: dictionary of modifications to single amino acid replacements, e.g. :code:`{"S(ph)": "s", "T(ph)": "t", "Y(ph)": "y"}`. If set to :code:`None`, uses the default annotations for S, T and Y phosphorylation.
 
     Returns:
         pd.DataFrame: annotated dataframe
@@ -91,7 +103,7 @@ def addPeptideAndPsitePositions(
     """
     if mod_dict is None:
         mod_dict = annotators.peptide_position.MOD_DICT
-    
+
     peptide_position_annotator = annotators.PeptidePositionAnnotator(
         fastaFile,
         pspInput=pspInput,
@@ -129,6 +141,9 @@ def addSiteSequenceContext(
 
     - 'Site sequence context' = +/- 15 amino acids around each of the modified sites, separated by semicolons
 
+    Required columns:
+        :code:`Site positions`
+
     Args:
         df: pandas dataframe with 'Site positions' column
         fastaFile: fasta file containing protein sequences
@@ -163,6 +178,14 @@ def addTurnoverRates(df: pd.DataFrame, turnoverFile: str) -> pd.DataFrame:
 
     - 'PTM Turnover' = rate of turnover for the modification sites according to Jana's PTM Turnover data
 
+    Example:
+        ::
+            
+            df = pa.addTurnoverRates(df, pa.turnoverFile)
+
+    Required columns:
+        :code:`Modified sequence`
+
     Args:
         df: pandas dataframe with 'Modified sequence' column
         turnoverFile: comma separated file with mapping from phosphosites to turnover information
@@ -186,6 +209,15 @@ def addPSPAnnotations(df: pd.DataFrame, phosphoSitePlusFile: str) -> pd.DataFram
     - LT_LIT = number of low-throughput studies
     - MS_LIT = number of high-throughput Mass Spec studies
     - MS_CST = number of high-throughput Mass Spec studies by CellSignalingTechnologies
+
+    Example:
+        ::
+
+            df = pa.addPeptideAndPsitePositions(df, pa.pspFastaFile, pspInput = True)
+            df = pa.addPSPAnnotations(df, pa.pspAnnotationFile)
+
+    Required columns:
+        :code:`Site positions`
 
     Args:
         df: pandas dataframe with 'Site positions' column
@@ -215,6 +247,15 @@ def addPSPRegulatoryAnnotations(
     - PSP_ON_OTHER_INTERACT = other interactions
     - PSP_NOTES = regulatory site notes
 
+    Example:
+        ::
+
+            df = pa.addPeptideAndPsitePositions(df, pa.pspFastaFile, pspInput = True)
+            df = pa.addPSPRegulatoryAnnotations(df, pa.pspRegulatoryFile)
+
+    Required columns:
+        :code:`Site positions`
+    
     Args:
         df: pandas dataframe with 'Site positions' column
         phosphoSitePlusRegulatoryFile: tab separated file with PhosphositePlus regulatory annotations
@@ -237,9 +278,17 @@ def addPSPKinaseSubstrateAnnotations(
 
     Adds the following annotation columns to dataframe\:
 
-    - PSP Kinases = all phosphorylating kinases according to PhosphoSitePlus, no distinction is made between in vivo
-      and in vitro evidence (this can be added in the future, if necessary)
+    - PSP Kinases = all phosphorylating kinases according to PhosphoSitePlus, no distinction is made between in vivo and in vitro evidence (this can be added in the future, if necessary)
 
+    Example:
+        ::
+
+            df = pa.addPeptideAndPsitePositions(df, pa.pspFastaFile, pspInput = True)
+            df = pa.addPSPKinaseSubstrateAnnotations(df, pa.pspKinaseSubstrateFile)
+
+    Required columns:
+        :code:`Site positions`
+    
     Args:
         df: pandas dataframe with 'Site positions' column
         phosphoSitePlusKinaseSubstrateFile: tab separated file with PhosphositePlus kinase substrate relations
@@ -265,6 +314,15 @@ def addDomains(df: pd.DataFrame, domainMappingFile: str):
 
     - Domains = semicolon separated list of domains that overlap with the peptide
 
+    Example:
+        ::
+
+            df = pa.addPeptideAndPsitePositions(df, pa.pspFastaFile, pspInput = True)
+            df = pa.addDomains(df, pa.domainMappingFile)
+
+    Required columns:
+        :code:`Matched proteins`, :code:`Start positions`, :code:`End positions`
+
     Args:
         df: pandas dataframe with 'Matched proteins', 'Start positions' and 'End positions' columns
         domainMappingFile: comma separated file with domains and their positions within the protein
@@ -286,6 +344,15 @@ def addMotifs(df: pd.DataFrame, motifsFile: str):
     Adds the following annotation columns to dataframe\:
 
     - Motifs = semicolon separated list of motifs that match with the site sequence contexts
+
+    Example:
+        ::
+
+            df = pa.addPeptideAndPsitePositions(df, pa.pspFastaFile, pspInput = True)
+            df = pa.addMotifs(df, pa.motifsFile)
+
+    Required columns:
+        :code:`Site sequence context`
 
     Args:
         df: pandas dataframe with 'Site sequence context' column
@@ -310,6 +377,16 @@ def addInVitroKinases(df: pd.DataFrame, inVitroKinaseSubstrateMappingFile: str):
     Adds the following annotation columns to dataframe\:
 
     - In Vitro Kinases = all phosphorylating kinases according to the Sugiyama in vitro kinase-substrate study
+
+
+    Example:
+        ::
+
+            df = pa.addPeptideAndPsitePositions(df, pa.pspFastaFile, pspInput = True)
+            df = pa.addInVitroKinases(df, pa.inVitroKinaseSubstrateMappingFile)
+
+    Required columns:
+        :code:`Site positions`
 
     Args:
         df: pandas dataframe with 'Site positions' column
@@ -338,11 +415,20 @@ def addKinaseLibraryAnnotations(
     followed by SiteSequenceContextAnnotator().
 
     Adds the following annotation columns to dataframe\:
-    
+
     - Motif Kinases = semicolon separated list of kinases that match with the site sequence contexts
     - Motif Scores = semicolon separated list of scores corresponding to Motif Kinases
     - Motif Percentiles = semicolon separated list of percentiles corresponding to Motif Kinases
     - Motif Totals = semicolon separated list of score*percentile corresponding to Motif Kinases
+
+    Example:
+        ::
+
+            df = pa.addPeptideAndPsitePositions(df, pa.pspFastaFile, pspInput = True)
+            df = pa.addKinaseLibraryAnnotations(df, pa.kinaseLibraryMotifsFile, pa.kinaseLibraryQuantilesFile)
+
+    Required columns:
+        :code:`Site sequence context`
 
     Args:
         df: pandas dataframe with 'Site sequence context' column
