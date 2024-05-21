@@ -131,12 +131,12 @@ def _build_ecdf(scores, quantiles):
     return f
 
 
-def _find_upstream_kinase(seq, quantiles, odds_dict, score_cutoff=3):
+def _find_upstream_kinase(seq, quantiles, odds_dict, score_cutoff=2):
     """
     Score all kinases against in Q and P to the input sequence
     """
     # Fast return for pY
-    if len(seq) == 0 or seq[len(seq) // 2] == "y":
+    if len(seq) == 0:
         return pd.Series(["", "", "", ""])
 
     # score all kinases
