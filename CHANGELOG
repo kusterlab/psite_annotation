@@ -1,3 +1,7 @@
+v0.5.2
+- Update kinase_library for pY Motifs (#8)
+- Improved documentation
+
 v0.5.1
 - Created readthedocs
 - Allow custom dictionary of modifications (#7)
