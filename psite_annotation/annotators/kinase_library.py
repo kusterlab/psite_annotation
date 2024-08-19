@@ -2,7 +2,6 @@ from typing import IO, Union
 
 import pandas as pd
 import numpy as np
-from scipy import interpolate
 
 from .annotator_base import check_columns
 
@@ -27,7 +26,10 @@ class KinaseLibraryAnnotator:
         self,
         motifs_file: Union[str, IO],
         quantiles_file: Union[str, IO],
+        top_n: int = 5,
         score_cutoff: float = 3,
+        threshold_type="total",
+        sort_type="total",
     ):
         """
         Initialize the input files and options for MotifAnnotator.
@@ -38,7 +40,10 @@ class KinaseLibraryAnnotator:
         """
         self.motifs_file = motifs_file
         self.quantiles_file = quantiles_file
+        self.top_n = top_n
         self.score_cutoff = score_cutoff
+        self.threshold_type = threshold_type
+        self.sort_type = sort_type
         self.odds_dict = None
         self.quantiles = None
 
@@ -93,7 +98,13 @@ class KinaseLibraryAnnotator:
             ["Motif Kinases", "Motif Scores", "Motif Percentiles", "Motif Totals"]
         ] = site_sequence_plus_minus_5.apply(
             lambda x: _find_upstream_kinase(
-                x, self.quantiles, self.odds_dict, threshold=self.score_cutoff
+                x,
+                self.quantiles,
+                self.odds_dict,
+                top_n=self.top_n,
+                threshold=self.score_cutoff,
+                threshold_type=self.threshold_type,
+                sort_type=self.sort_type,
             )
         )
 
@@ -131,7 +142,7 @@ def _find_upstream_kinase(
     """
     if len(seq) == 0:
         return pd.Series(["", "", "", ""])
-    
+
     # Map the different parameter options
     str_to_int_map = {
         "score": 0,

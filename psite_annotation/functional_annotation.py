@@ -180,7 +180,7 @@ def addTurnoverRates(df: pd.DataFrame, turnoverFile: str) -> pd.DataFrame:
 
     Example:
         ::
-            
+
             df = pa.addTurnoverRates(df, pa.turnoverFile)
 
     Required columns:
@@ -255,7 +255,7 @@ def addPSPRegulatoryAnnotations(
 
     Required columns:
         :code:`Site positions`
-    
+
     Args:
         df: pandas dataframe with 'Site positions' column
         phosphoSitePlusRegulatoryFile: tab separated file with PhosphositePlus regulatory annotations
@@ -288,7 +288,7 @@ def addPSPKinaseSubstrateAnnotations(
 
     Required columns:
         :code:`Site positions`
-    
+
     Args:
         df: pandas dataframe with 'Site positions' column
         phosphoSitePlusKinaseSubstrateFile: tab separated file with PhosphositePlus kinase substrate relations
@@ -404,7 +404,13 @@ def addInVitroKinases(df: pd.DataFrame, inVitroKinaseSubstrateMappingFile: str):
 
 
 def addKinaseLibraryAnnotations(
-    df: pd.DataFrame, motifs_file: str, quantiles_file: str
+    df: pd.DataFrame,
+    motifs_file: str,
+    quantiles_file: str,
+    top_n: int = 5,
+    sort_type="total",
+    threshold_type="total",
+    score_cutoff: float = 3,
 ):
     """Annotate pandas dataframe with highest scoring kinases from the kinase library.
 
@@ -434,12 +440,23 @@ def addKinaseLibraryAnnotations(
         df: pandas dataframe with 'Site sequence context' column
         motifs_file: tab separated file with in odds ratios for each kinase, AA and position
         quantiles_file: tab separated file with quantile score for each kinase
+        top_n: maximum number of returned kinases (default: 5)
+        sort_type: score by which to sort the kinases, one of "percentile", "score" or "total" (default: "total")
+        threshold_type: score to which to apply the cutoff, one of "percentile", "score" or "total" (total=score*percentile) (default: "total")
+        score_cutoff: do not report kinases with a score below this cutoff (default: 3.0)
 
     Returns:
         pd.DataFrame: annotated dataframe
 
     """
-    annotator = annotators.KinaseLibraryAnnotator(motifs_file, quantiles_file)
+    annotator = annotators.KinaseLibraryAnnotator(
+        motifs_file,
+        quantiles_file,
+        top_n=top_n,
+        sort_type=sort_type,
+        threshold_type=threshold_type,
+        score_cutoff=score_cutoff,
+    )
     annotator.load_annotations()
     df = annotator.annotate(df)
 
