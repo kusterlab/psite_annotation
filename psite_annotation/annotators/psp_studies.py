@@ -28,7 +28,9 @@ class PSPStudiesAnnotator:
 
     def load_annotations(self) -> None:
         """Reads in tab separated file with PhosphositePlus annotations and stores it as a dictionary."""
-        self.psp_df = pd.read_csv(self.annotation_file, sep="\t", skiprows=3, encoding='utf-8')
+        self.psp_df = pd.read_csv(
+            self.annotation_file, sep="\t", skiprows=3, encoding="utf-8"
+        )
 
         self.psp_df = self.psp_df[self.psp_df["ORGANISM"] == "human"]
 
@@ -48,7 +50,7 @@ class PSPStudiesAnnotator:
         # in case there are multiple entries with the same "Site positions" identifier, take the maximum of studies
         self.psp_df = self.psp_df.groupby("Site positions", sort=False)[
             ["LT_LIT", "MS_LIT", "MS_CST"]
-        ].agg({"LT_LIT": max, "MS_LIT": max, "MS_CST": max})
+        ].agg({"LT_LIT": "max", "MS_LIT": "max", "MS_CST": "max"})
 
         self.psp_df = self.psp_df.rename(columns=lambda x: f"PSP_{x}")
 
@@ -60,7 +62,7 @@ class PSPStudiesAnnotator:
         """Adds columns with number of studies.
 
         Adds the following annotation columns to dataframe\:
-        
+
         - LT_LIT = number of low-throughput studies
         - MS_LIT = number of high-throughput Mass Spec studies
         - MS_CST = number of high-throughput Mass Spec studies by CellSignalingTechnologies
