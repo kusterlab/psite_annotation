@@ -267,5 +267,5 @@ class TestAddKinaseLibraryAnnotations:
                 curves_df["Modified sequence"]
                 == "(ac)ANQVNGNAVQLKEEEEPMDTSS(ph)VTHTEHYK"
             ]["Motif Kinases"].values[0]
-            == "CK1A"
+            == "CSNK1A1"
         )

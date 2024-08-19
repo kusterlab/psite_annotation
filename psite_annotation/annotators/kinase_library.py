@@ -54,14 +54,14 @@ class KinaseLibraryAnnotator:
         ).T
         self.quantiles = {}
         for kinase, q in quantile_matrix_df.iterrows():
-            self.quantiles[kinase] = _build_ecdf(scores=q.index, quantiles=q.values)
+            self.quantiles[kinase] = (q.index, q.values)
 
     @check_columns(["Site sequence context"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds column with motifs the site sequence context matches with.
 
         Adds the following annotation columns to dataframe\:
-        
+
         - Motif Kinases = semicolon separated list of kinases that match with the site sequence contexts
         - Motif Scores = semicolon separated list of scores corresponding to Motif Kinases
         - Motif Percentiles = semicolon separated list of percentiles corresponding to Motif Kinases
@@ -93,73 +93,117 @@ class KinaseLibraryAnnotator:
             ["Motif Kinases", "Motif Scores", "Motif Percentiles", "Motif Totals"]
         ] = site_sequence_plus_minus_5.apply(
             lambda x: _find_upstream_kinase(
-                x, self.quantiles, self.odds_dict, self.score_cutoff
+                x, self.quantiles, self.odds_dict, threshold=self.score_cutoff
             )
         )
 
         return annotated_df
 
 
-def _score(seq, kinase, odds_dict, motif_size=5, sig_digits=4):
+def _find_upstream_kinase(
+    seq, Q, P, top_n=5, threshold=-np.inf, threshold_type="total", sort_type="total"
+):
     """
-    Score the motif based on the AA positional ODDS matrix given a sequence and a kinase
+    Score all kinases against input sequence based on Q-Matrix and P-Matrix.
+    Percentile is the standard metic according to Johnson et al. and has the best perfromace in my hands as well.
+
+    Input
+    -----
+    seq : str
+        sequence to score
+    Q : dict
+        Quantile matrix Q
+    P : dict
+        Probabilty matrix P
+    top_n : int
+        considers the top n ranked kinases only, default 15.
+    threshold: float
+        filters for total value bigger than threshold, default -np.inf.
+    threshold_type: float
+        specifies which metric should be used for filtering (0=score, 1=percentile, 2=score*percentile), default is percentile [1]
+    sort_type: float
+        specifies which metric should be used for ranking (0=score, 1=percentile, 2=score*percentile), default is percentile [1]
+
+    Returns
+    -------
+    (kinases, scores, percentiles, totals)
+    each is a string with semicolon sorted values
     """
-    score = []
-    for i, aa in enumerate(seq):
-        pos = i - motif_size
-        score.append(odds_dict.get((kinase, pos, aa), np.nan))
-    return round(np.log2(np.nanprod(score)), sig_digits)
-
-
-def _build_ecdf(scores, quantiles):
-    """
-    Build an empirical cumulative distribution function (ecdf) based on precomputed scores and quantiles
-
-    Parameter
-    ---------
-    scores : array like
-        input scores
-    quantiles : array like
-        input qunatiles
-
-    Return
-    ------
-    ecdf function that maps x->cumprop
-    """
-    # Return the ecdf as function
-    f = interpolate.interp1d(scores, quantiles, kind="linear")
-    return f
-
-
-def _find_upstream_kinase(seq, quantiles, odds_dict, score_cutoff=2):
-    """
-    Score all kinases against in Q and P to the input sequence
-    """
-    # Fast return for pY
     if len(seq) == 0:
         return pd.Series(["", "", "", ""])
+    
+    # Map the different parameter options
+    str_to_int_map = {
+        "score": 0,
+        "percentile": 1,
+        "total": 2,
+    }
+    if threshold_type not in str_to_int_map:
+        raise ValueError("threshold_type")
+    if sort_type not in str_to_int_map:
+        raise ValueError("sort_type")
+    threshold_type = str_to_int_map[threshold_type]
+    sort_type = str_to_int_map[sort_type]
 
-    # score all kinases
-    result = {}
-    for kinase in quantiles.keys():
-        s = _score(seq, kinase, odds_dict, motif_size=5, sig_digits=3)
-        q = round(float(quantiles[kinase](s)), 3)
-        t = round(s * q, 3)
-        result[kinase] = (s, q, t)
+    scores = []
+    kinases = []
+    for kinase in Q.keys():
+        s = _score(seq, kinase, P, motif_size=5)
+        if s <= 0:
+            continue
+        scores.append(s)
+        kinases.append(kinase)
+    scores = np.log2(np.array(scores))
 
-    # prepare the output by sorting from high to low and report the top 5 hits
-    top_5 = sorted(result.items(), key=lambda item: item[1][2], reverse=True)[:5]
-    top_5 = [(k, tpl) for k, tpl in top_5 if tpl[2] > score_cutoff]
-    if len(top_5) == 0:
+    quantiles = []
+    for kinase, s in zip(kinases, scores):
+        quantiles.append(_quantile(s, Q[kinase]))
+    quantiles = np.array(quantiles)
+    totals = scores * quantiles
+
+    result = {k: (s, q, t) for k, s, q, t in zip(kinases, scores, quantiles, totals)}
+    # Sort by sort_type, then filter threshold_type > threshold, and then take the topN of the list
+    out = sorted(result.items(), key=lambda item: item[1][sort_type], reverse=True)
+    out = [(k, *tpl) for k, tpl in out if tpl[threshold_type] > threshold]
+    out = out[:top_n]
+
+    if len(out) == 0:
         return pd.Series(["", "", "", ""])
 
-    kinases, scores, percentiles, totals = zip(
-        *[(k, s, q, t) for k, (s, q, t) in top_5]
-    )
+    kinases, scores, quantiles, totals = zip(*out)
+    scores = np.round(scores, 3)
+    quantiles = np.round(quantiles, 3)
+    totals = np.round(totals, 3)
 
-    kinases = ";".join(kinases)
-    scores = ";".join(map(str, scores))
-    percentiles = ";".join(map(str, percentiles))
-    totals = ";".join(map(str, totals))
-
+    # Transform to ; separated lists
+    kinases = ";".join(kinases)  # kinase
+    scores = ";".join(map(str, scores))  # [0] score
+    percentiles = ";".join(map(str, quantiles))  # [1] percentile
+    totals = ";".join(map(str, totals))  # [2] total = s*q
     return pd.Series([kinases, scores, percentiles, totals])
+
+
+def _score(seq, kinase, P, motif_size=5):
+    """
+    Score the motife based on the AA positional ODDS matrix given a sequence and a kinase
+    """
+    assert len(seq) == (2 * motif_size + 1)
+    score = 1.0
+    for i, aa in enumerate(seq):
+        pos = i - motif_size
+        score *= P.get((kinase, pos, aa), 1.0)
+    return score
+
+
+def _quantile(s, Q_kinase):
+    scores, quantiles = Q_kinase
+    index = np.searchsorted(scores, s)
+    if index + 1 >= len(scores):
+        quantile = quantiles[-1]
+    else:
+        y1 = quantiles[index]
+        y2 = quantiles[index + 1]
+        x1 = scores[index]
+        x2 = scores[index + 1]
+        quantile = y1 + (s - x1) * (y2 - y1) / (x2 - x1)
+    return float(quantile)
