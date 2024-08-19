@@ -1,3 +1,8 @@
+v0.5.3
+- Speed optimizations for kinase library motif analysis
+- Add kinase library arguments to functional annotation function
+- Support newer numpy and pandas version (#11)
+
 v0.5.2
 - Update kinase_library for pY Motifs (#8)
 - Improved documentation
