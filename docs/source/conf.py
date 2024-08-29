@@ -30,7 +30,6 @@ extensions = [
 
 autodoc_mock_imports = [
     "pandas",
-    "numpy",
     "scipy",
 ]
 autosummary_generate = True
