@@ -93,7 +93,7 @@ class KinaseLibraryAnnotator:
                 res = '_' * padding_length + sequence_context + '_' * padding_length
             else:
                 res = sequence_context
-            return res.upper()
+            return res[:desired_length//2] + res[desired_length//2].lower() + res[(desired_length//2)+1:].upper()
 
         site_sequence_plus_minus_5 = annotated_df["Site sequence context"].apply(adjust_context_length)
 
