@@ -84,15 +84,18 @@ class KinaseLibraryAnnotator:
         if not inplace:
             annotated_df = df.copy()
 
-        site_sequence_plus_minus_5 = (
-            annotated_df["Site sequence context"]
-            .str.slice(start=10, stop=15)
-            .str.upper()
-            + annotated_df["Site sequence context"].str.slice(start=15, stop=16)
-            + annotated_df["Site sequence context"]
-            .str.slice(start=16, stop=21)
-            .str.upper()
-        )
+        def adjust_context_length(sequence_context, desired_length=11):
+            if len(sequence_context) > desired_length:
+                excess = (len(sequence_context) - desired_length) // 2
+                res = sequence_context[excess: excess + desired_length]
+            elif len(sequence_context) < desired_length:
+                padding_length = (desired_length - len(sequence_context)) // 2
+                res = '_' * padding_length + s + '_' * padding_length
+            else:
+                res = sequence_context
+            return res.upper()
+
+        site_sequence_plus_minus_5 = annotated_df["Site sequence context"].apply(adjust_context_length)
 
         annotated_df[
             ["Motif Kinases", "Motif Scores", "Motif Percentiles", "Motif Totals"]
