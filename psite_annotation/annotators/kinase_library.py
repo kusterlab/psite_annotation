@@ -90,7 +90,7 @@ class KinaseLibraryAnnotator:
                 res = sequence_context[excess: excess + desired_length]
             elif len(sequence_context) < desired_length:
                 padding_length = (desired_length - len(sequence_context)) // 2
-                res = '_' * padding_length + s + '_' * padding_length
+                res = '_' * padding_length + sequence_context + '_' * padding_length
             else:
                 res = sequence_context
             return res.upper()
