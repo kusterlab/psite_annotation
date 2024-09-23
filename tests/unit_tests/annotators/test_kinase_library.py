@@ -88,6 +88,120 @@ def expected_output_df() -> pd.DataFrame:
         }
     )
 
+@pytest.fixture
+def input_df_exact_context() -> pd.DataFrame:
+    """Fixture to create an example input dataframe to the annotate() method.
+
+    Returns:
+        pd.DataFrame: Example input dataframe
+
+    """
+    return pd.DataFrame(
+        {
+            "Site sequence context": [
+                "AGGRGsGPGRR",
+                "AGGRGsTYGPG",
+                "GGRGStYGPGR",
+                "GRGSTyGPGRR",
+                "GRGSTyGPGRR",
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def expected_output_df_exact_context() -> pd.DataFrame:
+    """Fixture to create an example ouput dataframe to the annotate() method given the input_df fixture.
+
+    Returns:
+        pd.DataFrame: Output dataframe corresponding to input_df fixture
+
+    """
+    return pd.DataFrame(
+        {
+            "Site sequence context": [
+                "AGGRGsGPGRR",
+                "AGGRGsTYGPG",
+                "GGRGStYGPGR",
+                "GRGSTyGPGRR",
+                "GRGSTyGPGRR",
+            ],
+            "Motif Kinases": [
+                "AAK1;ACVR2A",
+                "ACVR2A",
+                "ACVR2A",
+                "",
+                "",
+            ],
+            "Motif Scores": [
+                "0.515;-2.848",
+                "-1.365",
+                "-1.174",
+                "",
+                "",
+            ],
+            "Motif Percentiles": [
+                "0.946;0.261",
+                "0.638",
+                "0.675",
+                "",
+                "",
+            ],
+            "Motif Totals": [
+                "0.487;-0.745",
+                "-0.871",
+                "-0.792",
+                "",
+                "",
+            ],
+        }
+    )
+
+@pytest.fixture
+def input_df_too_short_context() -> pd.DataFrame:
+    """Fixture to create an example input dataframe to the annotate() method.
+
+    Returns:
+        pd.DataFrame: Example input dataframe
+
+    """
+    return pd.DataFrame(
+        {
+            "Site sequence context": [
+                "GRGsGPG",
+                "GRGsTYG",
+                "RGStYGP",
+                "GSTyGPG",
+                "GSTyGPG",
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def expected_output_df_too_short_context() -> pd.DataFrame:
+    """Fixture to create an example ouput dataframe to the annotate() method given the input_df fixture.
+
+    Returns:
+        pd.DataFrame: Output dataframe corresponding to input_df fixture
+
+    """
+    return pd.DataFrame(
+        {
+            "Site sequence context": [
+                "GRGsGPG",
+                "GRGsTYG",
+                "RGStYGP",
+                "GSTyGPG",
+                "GSTyGPG",
+            ],
+            "Motif Kinases": ["AAK1;ACVR2A", "ACVR2A", "ACVR2A", "", ""],
+            "Motif Scores": ["0.782;-2.476", "-1.619", "-0.67", "", ""],
+            "Motif Percentiles": ["0.952;0.354", "0.581", "0.752", "", ""],
+            "Motif Totals": ["0.745;-0.876", "-0.94", "-0.504", "", ""],
+        }
+    )
+
 
 class TestKinaseLibraryAnnotator:
     """Test the KinaseLibraryAnnotator class."""
@@ -152,6 +266,74 @@ class TestKinaseLibraryAnnotator:
         # Assert that the output dataframe has the expected values
 
         pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
+
+    
+    def test_annotate_exact_context(
+        self,
+        annotator,
+        input_df_exact_context,
+        expected_output_df_exact_context,
+    ):
+        """Test that the annotate method correctly adds the motif annotations to the input dataframe as new column.
+
+        Args:
+            annotator: Annotator object with mock file loaded
+            input_df: Example input dataframe
+            expected_output_df: Expected output dataframe
+
+        """
+        annotator.load_annotations()
+
+        # Annotate the input dataframe
+        output_df = annotator.annotate(input_df_exact_context)
+
+        # Assert that the output dataframe has the expected columns
+        assert set(output_df.columns) == {
+            "Site sequence context",
+            "Motif Kinases",
+            "Motif Scores",
+            "Motif Percentiles",
+            "Motif Totals",
+        }
+
+        print(output_df.to_dict(orient="list"))
+
+        # Assert that the output dataframe has the expected values
+        pd.testing.assert_frame_equal(
+            output_df, expected_output_df_exact_context, check_like=True
+        )
+    def test_annotate_too_short_context(
+        self,
+        annotator,
+        input_df_too_short_context,
+        expected_output_df_too_short_context,
+    ):
+        """Test that the annotate method correctly adds the motif annotations to the input dataframe as new column.
+
+        Args:
+            annotator: Annotator object with mock file loaded
+            input_df: Example input dataframe
+            expected_output_df: Expected output dataframe
+
+        """
+        annotator.load_annotations()
+
+        # Annotate the input dataframe
+        output_df = annotator.annotate(input_df_too_short_context)
+
+        # Assert that the output dataframe has the expected columns
+        assert set(output_df.columns) == {
+            "Site sequence context",
+            "Motif Kinases",
+            "Motif Scores",
+            "Motif Percentiles",
+            "Motif Totals",
+        }
+
+        # Assert that the output dataframe has the expected values
+        pd.testing.assert_frame_equal(
+            output_df, expected_output_df_too_short_context, check_like=True
+        )
 
     def test_annotate_input_df_unchanged(self, annotator, input_df):
         """Test that the annotate method does not alter the input dataframe.
