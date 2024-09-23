@@ -304,7 +304,7 @@ class TestGetPeptidePositions:
             "Q86U42;Q86U42-2",
             "1;1",
             "23;23",
-            "Q86U42-2_S19;Q86U42_S19",
+            "Q86U42_S19;Q86U42-2_S19",
         )
 
     def test_get_peptide_positions_multiple_occurrence(self, proteinSequences):
@@ -404,7 +404,7 @@ class TestGetPeptidePositions:
             "Q86U42;Q86U42-2",
             "1;1",
             "25;25",
-            "Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21;Q86U42_S19;Q86U42_T20;Q86U42_Y21",
+            "Q86U42_S19;Q86U42_T20;Q86U42_Y21;Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21",
         )
 
     def test_get_peptide_positions_all_potential_sites(
@@ -428,7 +428,7 @@ class TestGetPeptidePositions:
             "Q86U42;Q86U42-2",
             "1;1",
             "25;25",
-            "Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21;Q86U42_S19;Q86U42_T20;Q86U42_Y21",
+            "Q86U42_S19;Q86U42_T20;Q86U42_Y21;Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21",
         )
 
 

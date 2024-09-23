@@ -114,15 +114,15 @@ def addPeptideAndPsitePositions(
     peptide_position_annotator.load_annotations()
     df = peptide_position_annotator.annotate(df)
 
-    annotator = annotators.SiteSequenceContextAnnotator(
+    site_seq_context_annotator = annotators.SiteSequenceContextAnnotator(
         fastaFile,
         pspInput=pspInput,
         context_left=context_left,
         context_right=context_right,
         retain_other_mods=retain_other_mods,
     )
-    annotator.load_annotations()
-    df = annotator.annotate(df)
+    site_seq_context_annotator.load_annotations()
+    df = site_seq_context_annotator.annotate(df)
 
     return df
 

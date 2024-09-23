@@ -135,7 +135,7 @@ def expected_output_df_custom_context() -> pd.DataFrame:
             ],
             "Site sequence context": [
                 "HRAGStKDAG",
-                "GRGSEsIKIP;MCGRGsESIK",
+                "MCGRGsESIK;GRGSEsIKIP",
                 "",
                 "TMFSWsEQNG",
                 "",
@@ -328,7 +328,7 @@ class TestGetSiteSequenceContexts:
 
         assert (
             pa._get_site_sequence_contexts(site_position_string, proteinSequences)
-            == "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE"
+            == "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE;AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE"
         )
 
     def test_get_site_sequence_contexts_custom_context(self, proteinSequences):
@@ -344,7 +344,7 @@ class TestGetSiteSequenceContexts:
             pa._get_site_sequence_contexts(
                 site_position_string, proteinSequences, context_left=5, context_right=4
             )
-            == "AGGRGsGPGR"
+            == "AGGRGsGPGR;AGGRGsGPGR"
         )
 
     def test_get_site_sequence_contexts_all_potential_sites(
@@ -357,14 +357,15 @@ class TestGetSiteSequenceContexts:
 
         """
         site_position_string = (
-            "Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21;Q86U42_S19;Q86U42_T20;Q86U42_Y21"
+            "Q86U42_S19;Q86U42_T20;Q86U42_Y21;Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21"
         )
 
         assert (
             pa._get_site_sequence_contexts(
                 site_position_string, proteinSequencesExtraPhospho
             )
-            == "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG;AAAAAAAGAAGGRGStYGPGRRRHLVPGAGG;AAAAAAGAAGGRGSTyGPGRRRHLVPGAGGE"
+            == "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG;AAAAAAAGAAGGRGStYGPGRRRHLVPGAGG;AAAAAAGAAGGRGSTyGPGRRRHLVPGAGGE;" +
+            "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG;AAAAAAAGAAGGRGStYGPGRRRHLVPGAGG;AAAAAAGAAGGRGSTyGPGRRRHLVPGAGGE"
         )
 
     def test_get_site_sequence_context_missing_protein(self):
