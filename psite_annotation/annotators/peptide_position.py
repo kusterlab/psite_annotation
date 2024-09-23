@@ -228,7 +228,7 @@ def _get_peptide_positions(
         ";".join(map(str, matchedProteins)),
         ";".join(map(str, startPositions)),
         ";".join(map(str, endPositions)),
-        ";".join(sorted(set(proteinPositions))),
+        ";".join(map(str, proteinPositions)),
     )
 
 

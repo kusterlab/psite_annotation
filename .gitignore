@@ -5,3 +5,4 @@ notebooks
 .pytest_cache
 dist
 data
+.idea

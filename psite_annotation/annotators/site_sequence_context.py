@@ -103,7 +103,7 @@ def _get_site_sequence_contexts(
         ),
         site_position_strings,
     )
-    return ";".join(sorted(set(contexts)))
+    return ";".join(contexts)
 
 
 def _get_site_sequence_context(
