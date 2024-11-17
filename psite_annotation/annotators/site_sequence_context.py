@@ -29,6 +29,8 @@ class SiteSequenceContextAnnotator:
         context_left: int = 15,
         context_right: int = 15,
         retain_other_mods: bool = False,
+        return_unique: bool=False,
+        return_sorted: bool=False,
     ):
         """
         Initialize the input files and options for PeptidePositionAnnotator.
@@ -47,6 +49,8 @@ class SiteSequenceContextAnnotator:
         self.context_left = context_left
         self.context_right = context_right
         self.retain_other_mods = retain_other_mods
+        self.return_unique = return_unique
+        self.return_sorted = return_sorted
 
     def load_annotations(self) -> None:
         """Reads in protein sequences from fasta file."""
@@ -85,13 +89,19 @@ class SiteSequenceContextAnnotator:
                 context_left=self.context_left,
                 context_right=self.context_right,
                 retain_other_mods=self.retain_other_mods,
+                return_unique=self.return_unique,
+                return_sorted=self.return_sorted,
             )
         )
         return annotated_df
 
 
 def _get_site_sequence_contexts(
-    site_position_string: str, protein_sequences: Dict[str, str], **kwargs
+        site_position_string: str,
+        protein_sequences: Dict[str, str],
+        return_unique: bool = False,
+        return_sorted: bool = False,
+        **kwargs
 ) -> str:
     if len(site_position_string) == 0:
         return ""
@@ -103,6 +113,13 @@ def _get_site_sequence_contexts(
         ),
         site_position_strings,
     )
+
+    if return_unique:
+        contexts = set(contexts)
+
+    if return_sorted:
+        contexts = sorted(contexts)
+
     return ";".join(contexts)
 
 

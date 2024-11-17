@@ -407,10 +407,41 @@ class TestGetPeptidePositions:
             "Q86U42_S19;Q86U42_T20;Q86U42_Y21;Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21",
         )
 
-    def test_get_peptide_positions_all_potential_sites(
+
+    # Not sure if this is ever desired behaviour, but it's how the old implementation would have handled it:
+    # Make the Site positions unique, but not the other three columns.
+    # I would either not add the set() at all, or add it to all four output columns
+    # The latter might produce undesired results for Start/End positions, if they agree but the Protein IDs are different
+    def test_get_peptide_positions_all_potential_sites_unique(
         self, proteinSequencesExtraPhospho
     ):
-        """Test the _get_peptide_positions function with two isoforms and the returnAllPotentialSites option.
+        """Test the _get_peptide_positions function with two isoforms and the returnAllPotentialSites option, eliminating duplicates.
+
+        Args:
+            proteinSequencesExtraPhospho: dictionary of UniProt identifiers to protein sequences
+
+        """
+        proteinIds = "Q86U42;Q86U42-2;Q86U42"
+        modPeptideSequence = "(ac)AAAAAAAAAAGAAGGRGS(ph)TYGPGR"
+
+        assert pa._get_peptide_positions(
+            proteinIds,
+            proteinSequencesExtraPhospho,
+            modPeptideSequence,
+            returnAllPotentialSites=True,
+            return_unique=True,
+            return_sorted=True
+        ) == (
+            "Q86U42;Q86U42-2;Q86U42",
+            "1;1;1",
+            "25;25;25",
+            'Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21;Q86U42_S19;Q86U42_T20;Q86U42_Y21',
+        )
+
+    def test_get_peptide_positions_all_potential_sites_sorted(
+        self, proteinSequencesExtraPhospho
+    ):
+        """Test the _get_peptide_positions function with two isoforms and the returnAllPotentialSites option, sorting sites alphabetically.
 
         Args:
             proteinSequencesExtraPhospho: dictionary of UniProt identifiers to protein sequences
@@ -424,11 +455,12 @@ class TestGetPeptidePositions:
             proteinSequencesExtraPhospho,
             modPeptideSequence,
             returnAllPotentialSites=True,
+            return_sorted=True
         ) == (
             "Q86U42;Q86U42-2",
             "1;1",
             "25;25",
-            "Q86U42_S19;Q86U42_T20;Q86U42_Y21;Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21",
+            "Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21;Q86U42_S19;Q86U42_T20;Q86U42_Y21",
         )
 
 
