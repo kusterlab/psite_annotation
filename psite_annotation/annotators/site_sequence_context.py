@@ -133,7 +133,7 @@ def _get_site_sequence_context(
     proteinLength = len(protein_sequences[proteinId])
     if (
         proteinLength == 0
-        or sitePos > proteinLength
+        or sitePos >= proteinLength
         or protein_sequences[proteinId][sitePos].lower() != mod
     ):
         return ""
@@ -201,7 +201,7 @@ def _add_modification_to_sequence_context(
     )
 
 
-def _unpack_site_position_string(site_position_string: str) -> Tuple[str, str, str]:
+def _unpack_site_position_string(site_position_string: str) -> Tuple[str, int, str]:
     if not re.match(SITE_POSITION_PATTERN, site_position_string):
         raise ValueError(
             f"Invalid format for site_position_string: {site_position_string}"

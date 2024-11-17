@@ -375,6 +375,12 @@ class TestGetSiteSequenceContexts:
 
         assert pa._get_site_sequence_contexts(sitePosString, proteinSequences) == ""
 
+    def test_get_site_sequence_context_out_of_bounds(self, proteinSequences):
+        """Test the _get_site_sequence_contexts function when the position is larger than the length of the sequence"""
+        sitePosString = "Q86U42_S307" # (Q86U42 has length 306)
+        assert pa._get_site_sequence_contexts(sitePosString, proteinSequences) == ""
+
+
 
 class TestAddModificationToSequenceContext:
     def test_same_position(self):
