@@ -421,6 +421,30 @@ class TestKinaseLibraryAnnotator:
         with pytest.raises(AssertionError):
             _score('SHORT', None, None, 5)
 
+    def test_annotate_empty_seq(self, annotator):
+        """Test that the annotate method correctly annotated empty input sequences with no scores
+
+        Args:
+            annotator: Annotator object with mock file loaded
+
+        """
+
+        df = pd.DataFrame({'Site sequence context': ['', '_']})
+        annotator.load_annotations()
+
+        output_df = annotator.annotate(df)
+
+        expected_empty_output_df = pd.DataFrame({
+            "Site sequence context": ['', '_'],
+            "Motif Kinases": ['', ''],
+            "Motif Scores": ['', ''],
+            "Motif Percentiles": ['', ''],
+            "Motif Totals": ['', ''],
+        })
+
+        pd.testing.assert_frame_equal(output_df, expected_empty_output_df, check_like=True)
+
+
 # Define the mock input file as a string
 mock_motifs_input_file = """Kinase	Position	AA	Odds Ratio
 AAK1	-1	A	0.6544

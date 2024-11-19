@@ -5,6 +5,18 @@ import numpy as np
 
 from .annotator_base import check_columns
 
+ALLOWED_AA_CHARACTERS = {'A', 'C', 'D', 'E', 'F',
+                         'G', 'H', 'I', 'K', 'L',
+                         'M', 'N', 'P', 'Q', 'R',
+                         'S', 'T', 'V', 'W', 'Y',
+                         's', 't', 'y', '_'}
+
+
+def validate_sequence(seq):
+    invalid_chars = set(seq) - ALLOWED_AA_CHARACTERS
+    if invalid_chars:
+        raise ValueError(f"Sequence '{seq}' contains invalid characters: {''.join(invalid_chars)}")
+
 
 class KinaseLibraryAnnotator:
     """Annotate pandas dataframe with highest scoring kinases from the kinase library.
@@ -48,7 +60,6 @@ class KinaseLibraryAnnotator:
         self.sort_type = sort_type
         self.odds_dict = None
         self.quantiles = None
-        self.allowed_aa_characters = None
 
     def load_annotations(self) -> None:
         """Reads in tab separated file with motif and quantile annotations."""
@@ -56,8 +67,6 @@ class KinaseLibraryAnnotator:
             self.motifs_file, sep="\t", index_col=["Kinase", "Position", "AA"]
         )
         self.odds_dict = odds_df["Odds Ratio"].to_dict()
-
-        self.allowed_aa_characters = set(odds_df.index.get_level_values('AA'))
 
         quantile_matrix_df = pd.read_csv(
             self.quantiles_file, sep="\t", index_col="Score"
@@ -95,20 +104,22 @@ class KinaseLibraryAnnotator:
             annotated_df = annotated_df.explode('Site sequence context')
 
         # Throw an error if any sequence contains illegal characters
-        annotated_df["Site sequence context"].apply(self.validate_sequence)
+        annotated_df["Site sequence context"].apply(validate_sequence)
 
+        def adjust_context_length(sequence, desired_length=11):
+            # Edge case: Empty sequences are converted into '_' - they will not receive any kinases or scores
+            if sequence == '':
+                sequence = '_'
 
-
-        def adjust_context_length(sequence_context, desired_length=11):
-            if len(sequence_context) > desired_length:
-                excess = (len(sequence_context) - desired_length) // 2
-                res = sequence_context[excess: excess + desired_length]
-            elif len(sequence_context) < desired_length:
-                padding_length = (desired_length - len(sequence_context)) // 2
-                res = '_' * padding_length + sequence_context + '_' * padding_length
+            if len(sequence) > desired_length:
+                excess = (len(sequence) - desired_length) // 2
+                res = sequence[excess: excess + desired_length]
+            elif len(sequence) < desired_length:
+                padding_length = (desired_length - len(sequence)) // 2
+                res = '_' * padding_length + sequence + '_' * padding_length
             else:
-                res = sequence_context
-            return res[:desired_length//2] + res[desired_length//2].lower() + res[(desired_length//2)+1:].upper()
+                res = sequence
+            return res[:desired_length//2].upper() + res[desired_length//2].lower() + res[(desired_length//2)+1:].upper()
 
         site_sequence_plus_minus_5 = annotated_df["Site sequence context"].apply(adjust_context_length)
 
@@ -127,11 +138,6 @@ class KinaseLibraryAnnotator:
         )
 
         return annotated_df
-
-    def validate_sequence(self, seq):
-        invalid_chars = set(seq) - self.allowed_aa_characters
-        if invalid_chars:
-            raise ValueError(f"Sequence '{seq}' contains invalid characters: {''.join(invalid_chars)}")
 
 
 def _find_upstream_kinase(

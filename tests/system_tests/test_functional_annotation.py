@@ -67,14 +67,14 @@ class TestAddPsitePositions:
             curves_df[
                 curves_df["Modified sequence"] == "(ac)AAS(ph)DTERDGLAPEKT(ph)SPDRDK"
             ]["Site positions"].values[0]
-            == "E9PI52_S4;E9PI52_T16;Q7L4I2_S4;Q7L4I2_T16"
+            == "Q7L4I2_S4;Q7L4I2_T16;E9PI52_S4;E9PI52_T16"
         )
 
         assert (
             curves_df[
                 curves_df["Modified sequence"] == "(ac)AAS(ph)DTERDGLAPEKT(ph)SPDRDK"
             ]["Site sequence context"].values[0]
-            == "MAAsDTERDGLAPEKtSPDRDKKKEQSEVSV;____________MAAsDTERDGLAPEKtSPD"
+            == "____________MAAsDTERDGLAPEKtSPD;MAAsDTERDGLAPEKtSPDRDKKKEQSEVSV;____________MAAsDTERDGLAPEKtSPD;MAAsDTERDGLAPEKtSPDRDKKKEQSEVSV"
         )
 
     def test_addPeptideAndPsitePositions_localization_uncertainty(self, curves_df):
@@ -87,14 +87,14 @@ class TestAddPsitePositions:
             curves_df[curves_df["Modified sequence"] == "(ac)AAAMDVDT(ph)PSGTNSGAGK"][
                 "Site positions"
             ].values[0]
-            == "P62877_S11;P62877_T9"
+            == "P62877_T9;P62877_S11"
         )
 
         assert (
             curves_df[curves_df["Modified sequence"] == "(ac)AAAMDVDT(ph)PSGTNSGAGK"][
                 "Site sequence context"
             ].values[0]
-            == "_____MAAAMDVDTPsGTNSGAGKKRFEVKK;_______MAAAMDVDtPSGTNSGAGKKRFEV"
+            == "_______MAAAMDVDtPSGTNSGAGKKRFEV;_____MAAAMDVDTPsGTNSGAGKKRFEVKK"
         )
 
     def test_addPeptideAndPsitePositionsPSP(self, curves_df):
@@ -258,7 +258,10 @@ class TestAddKinaseLibraryAnnotations:
     def test_addKinaseLibraryAnnotations(self, curves_df):
         curves_df = pa.addPeptideAndPsitePositions(curves_df, fastaFile)
         curves_df = pa.addKinaseLibraryAnnotations(
-            curves_df, pa.kinaseLibraryMotifsFile, pa.kinaseLibraryQuantilesFile
+            curves_df,
+            pa.kinaseLibraryMotifsFile,
+            pa.kinaseLibraryQuantilesFile,
+            split_sequences=True,
         )
         # print(curves_df[curves_df["Motif Kinases"] != ""].head(n=100))
 
