@@ -221,7 +221,8 @@ def _score(seq, kinase, P, motif_size=5):
     """
     Score the motife based on the AA positional ODDS matrix given a sequence and a kinase
     """
-    assert len(seq) == (2 * motif_size + 1)
+    assert len(seq) == (2 * motif_size + 1), \
+        f'Sequence expected to have length {(2 * motif_size + 1)} but had length {len(seq)} instead'
     score = 1.0
     for i, aa in enumerate(seq):
         pos = i - motif_size

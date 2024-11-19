@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 from psite_annotation.annotators.annotator_base import MissingColumnsError
 
-from psite_annotation.annotators.kinase_library import KinaseLibraryAnnotator
+from psite_annotation.annotators.kinase_library import KinaseLibraryAnnotator, _score
 
 
 @pytest.fixture
@@ -316,7 +316,7 @@ class TestKinaseLibraryAnnotator:
         pd.testing.assert_frame_equal(
             output_df, expected_output_df_exact_context, check_like=True
         )
-        
+
     def test_annotate_too_short_context(
         self,
         annotator,
@@ -415,6 +415,11 @@ class TestKinaseLibraryAnnotator:
 
         pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
 
+    def test_raise_error_on_too_short_sequence(self):
+        """Test that the _score function throws an error if the submitted sequence does not have the length:
+         (2 * motif_size + 1)"""
+        with pytest.raises(AssertionError):
+            _score('SHORT', None, None, 5)
 
 # Define the mock input file as a string
 mock_motifs_input_file = """Kinase	Position	AA	Odds Ratio
