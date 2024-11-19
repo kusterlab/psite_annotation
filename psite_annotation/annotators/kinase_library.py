@@ -28,6 +28,7 @@ class KinaseLibraryAnnotator:
         quantiles_file: Union[str, IO],
         top_n: int = 5,
         score_cutoff: float = 3,
+        split_sequences: bool = False,
         threshold_type="total",
         sort_type="total",
     ):
@@ -43,6 +44,7 @@ class KinaseLibraryAnnotator:
         self.top_n = top_n
         self.score_cutoff = score_cutoff
         self.threshold_type = threshold_type
+        self.split_sequences = split_sequences
         self.sort_type = sort_type
         self.odds_dict = None
         self.quantiles = None
@@ -84,12 +86,18 @@ class KinaseLibraryAnnotator:
 
         """
 
-        # Throw an error if any sequence contains illegal characters
-        df["Site sequence context"].apply(self.validate_sequence)
-
         annotated_df = df
         if not inplace:
             annotated_df = df.copy()
+
+        if self.split_sequences:
+            annotated_df['Site sequence context'] = annotated_df['Site sequence context'].apply(lambda s: s.split(';'))
+            annotated_df = annotated_df.explode('Site sequence context')
+
+        # Throw an error if any sequence contains illegal characters
+        annotated_df["Site sequence context"].apply(self.validate_sequence)
+
+
 
         def adjust_context_length(sequence_context, desired_length=11):
             if len(sequence_context) > desired_length:

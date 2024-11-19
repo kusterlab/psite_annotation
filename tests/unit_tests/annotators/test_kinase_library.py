@@ -202,6 +202,23 @@ def expected_output_df_too_short_context() -> pd.DataFrame:
         }
     )
 
+@pytest.fixture
+def input_df_multiple_seq() -> pd.DataFrame:
+    """Fixture to create an example input dataframe with multiple ';'-separated site sequence contexts
+
+    Returns:
+        pd.DataFrame: Example input dataframe
+
+    """
+    return pd.DataFrame(
+        {
+            "Site sequence context": [
+                "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE;AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG;AAAAAAAGAAGGRGStYGPGRRRHLVPGAGG",
+                "AAAAAAGAAGGRGSTyGPGRRRHLVPGAGGE;AAAAAAGAAGGRGSTyGPGRRRHLVPGAGGE",
+            ],
+        }
+    )
+
 
 class TestKinaseLibraryAnnotator:
     """Test the KinaseLibraryAnnotator class."""
@@ -368,24 +385,38 @@ class TestKinaseLibraryAnnotator:
 
         pd.testing.assert_frame_equal(input_df, expected_output_df, check_like=True)
 
-    def test_raise_error_on_illegal_char(self, annotator):
+    def test_raise_error_on_illegal_char(self, annotator, input_df_multiple_seq):
         """Test that an error is raised if the "Site sequence context" column contains non-AA characters.
-
+        If 'split_sequences' is not set to True, the ';' is considered an illegal character.
         Args:
             annotator: Annotator object with mock file loaded
+            input_df_multiple_seq: Example input dataframe with ';' in the "Site sequence context" column
         """
         annotator.load_annotations()
 
-        input_df = pd.DataFrame(
-            {
-                "Site sequence context": [
-                    "YLLP;AIVHI"
-                ],
-            }
-        )
-
         with pytest.raises(ValueError):
-            annotator.annotate(input_df)
+            annotator.annotate(input_df_multiple_seq)
+
+    def test_annotate_split_multiple_seq(self, annotator, input_df_multiple_seq, expected_output_df):
+        """Test that the annotate method correctly splits up ';'-separated sequences before annotation, if requested.
+
+        Args:
+            annotator: Annotator object with mock file loaded
+            input_df_multiple_seq: Example input dataframe with ';'-split "Site sequence context"
+            expected_output_df: Expected output dataframe
+
+        """
+        annotator.split_sequences = True
+
+        annotator.load_annotations()
+
+        output_df = annotator.annotate(input_df_multiple_seq)
+
+        #In order for the output to be equal to the expected output, we need to drop the index
+        output_df.reset_index(inplace=True, drop=True)
+
+        pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
+
 
 # Define the mock input file as a string
 mock_motifs_input_file = """Kinase	Position	AA	Odds Ratio
