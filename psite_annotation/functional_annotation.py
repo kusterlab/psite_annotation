@@ -61,6 +61,8 @@ def addPeptideAndPsitePositions(
     context_right: int = 15,
     retain_other_mods: bool = False,
     mod_dict: Dict[str, str] = None,
+        return_unique: bool = False,
+        return_sorted: bool = False,
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
 
@@ -96,6 +98,8 @@ def addPeptideAndPsitePositions(
         context_right: number of amino acids to the right of the modification to include
         retain_other_mods: retain other modifications from the modified peptide in the sequence context in lower case
         mod_dict: dictionary of modifications to single amino acid replacements, e.g. :code:`{"S(ph)": "s", "T(ph)": "t", "Y(ph)": "y"}`. If set to :code:`None`, uses the default annotations for S, T and Y phosphorylation.
+        return_unique: eliminate duplicates from the 'Site sequence context' and Site positions' columns, not preserving the order between the them and the rest of the data frame
+        return_sorted: sort the 'Site sequence context' and Site positions' columns alphabetically, not preserving the order between the them and the rest of the data frame
 
     Returns:
         pd.DataFrame: annotated dataframe
@@ -110,6 +114,8 @@ def addPeptideAndPsitePositions(
         returnAllPotentialSites=returnAllPotentialSites,
         localization_uncertainty=localization_uncertainty,
         mod_dict=mod_dict,
+        return_unique=return_unique,
+        return_sorted=return_sorted,
     )
     peptide_position_annotator.load_annotations()
     df = peptide_position_annotator.annotate(df)
@@ -120,6 +126,8 @@ def addPeptideAndPsitePositions(
         context_left=context_left,
         context_right=context_right,
         retain_other_mods=retain_other_mods,
+        return_unique=return_unique,
+        return_sorted=return_sorted,
     )
     site_seq_context_annotator.load_annotations()
     df = site_seq_context_annotator.annotate(df)
@@ -134,6 +142,8 @@ def addSiteSequenceContext(
     context_left: int = 15,
     context_right: int = 15,
     retain_other_mods: bool = False,
+    return_unique: bool = False,
+    return_sorted: bool = False,
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with sequence context of a p-site.
 
@@ -151,6 +161,8 @@ def addSiteSequenceContext(
         context_left: number of amino acids to the left of the modification to include
         context_right: number of amino acids to the right of the modification to include
         retain_other_mods: retain other modifications from the modified peptide in the sequence context in lower case
+        return_unique: eliminate duplicated sequences from the 'Site sequence context' column, not preserving the order between the this column and the rest of the data frame
+        return_sorted: sort the sequences from the 'Site sequence context' column alphabetically, not preserving the order between the this column and the rest of the data frame
 
     Returns:
         pd.DataFrame: annotated dataframe
@@ -162,6 +174,8 @@ def addSiteSequenceContext(
         context_left=context_left,
         context_right=context_right,
         retain_other_mods=retain_other_mods,
+        return_unique=return_unique,
+        return_sorted=return_sorted,
     )
     annotator.load_annotations()
     df = annotator.annotate(df)

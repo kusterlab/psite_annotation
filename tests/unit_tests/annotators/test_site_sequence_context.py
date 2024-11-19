@@ -331,6 +331,34 @@ class TestGetSiteSequenceContexts:
             == "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE;AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE"
         )
 
+    def test_get_site_sequence_contexts_unique(self, proteinSequences):
+        """Test the _get_site_sequence_contexts function with duplicate elimination.
+
+        Args:
+            proteinSequences: dictionary of UniProt identifiers to protein sequences
+
+        """
+        site_position_string = "Q86U42-2_S19;Q86U42_S19"
+
+        assert (
+            pa._get_site_sequence_contexts(site_position_string, proteinSequences, return_unique=True)
+            == "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE"
+        )
+
+    def test_get_site_sequence_contexts_sorted(self, proteinSequences):
+        """Test the _get_site_sequence_contexts function with sorting of output
+
+        Args:
+            proteinSequences: dictionary of UniProt identifiers to protein sequences
+
+        """
+        site_position_string = "Q86U42_Y46;Q86U42_S19"
+
+        assert (
+            pa._get_site_sequence_contexts(site_position_string, proteinSequences, return_sorted=True)
+            == "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE;AGGEAGEGAPGGAGDyGNGLESEELEPEELL"
+        )
+
     def test_get_site_sequence_contexts_custom_context(self, proteinSequences):
         """Test the _get_site_sequence_contexts function with two isoforms with the identical site sequence context.
 
@@ -431,7 +459,7 @@ class TestUnpackSitePositionString:
     def test_invalid_format(self):
         with pytest.raises(ValueError, match="Invalid format for site_position_string"):
             pa._unpack_site_position_string("invalid_string")
-            
+
 
 
 # You may need to adjust the imports and module names based on your actual module structure.

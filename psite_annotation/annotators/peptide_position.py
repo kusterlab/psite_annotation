@@ -38,6 +38,8 @@ class PeptidePositionAnnotator:
         returnAllPotentialSites: bool = False,
         localization_uncertainty: int = 0,
         mod_dict: Dict[str, str] = MOD_DICT,
+            return_unique: bool = False,
+            return_sorted: bool = False,
     ) -> None:
         """
         Initialize the input files and options for PeptidePositionAnnotator.
@@ -56,6 +58,8 @@ class PeptidePositionAnnotator:
         self.localization_uncertainty = localization_uncertainty
         self.protein_sequences = None
         self.mod_dict = mod_dict
+        self.return_unique = return_unique
+        self.return_sorted = return_sorted
 
     def load_annotations(self) -> None:
         """Reads in protein sequences from fasta file."""
@@ -106,15 +110,17 @@ class PeptidePositionAnnotator:
             ]
         ] = annotated_df[["Proteins", "Modified sequence"]].apply(
             lambda x: _get_peptide_positions(
-                x["Proteins"],
-                self.protein_sequences,
-                x["Modified sequence"],
-                self.returnAllPotentialSites,
-                self.localization_uncertainty,
-                self.mod_dict,
-                mod_regex,
-                mod_pattern,
-                potential_mods,
+                proteinIds=x["Proteins"],
+                protein_sequences=self.protein_sequences,
+                mod_peptide_sequence=x["Modified sequence"],
+                return_unique=self.return_unique,
+                return_sorted=self.return_sorted,
+                returnAllPotentialSites=self.returnAllPotentialSites,
+                localization_uncertainty=self.localization_uncertainty,
+                mod_dict=self.mod_dict,
+                mod_regex=mod_regex,
+                mod_pattern=mod_pattern,
+                potential_mods=potential_mods,
             ),
             axis=1,
             result_type="expand",
@@ -167,6 +173,8 @@ def _get_peptide_positions(
     protein_sequences: Dict[str, str],
     mod_peptide_sequence: str,
     returnAllPotentialSites: bool = False,
+        return_unique: bool = False,
+        return_sorted: bool = False,
     localization_uncertainty: int = 0,
     mod_dict: Dict[str, str] = MOD_DICT,
     mod_regex: Pattern = _get_mod_regex(MOD_DICT),
@@ -223,6 +231,12 @@ def _get_peptide_positions(
                 )
 
                 proteinPositions.append(site_position_string)
+
+    if return_unique:
+        proteinPositions = set(proteinPositions)
+
+    if return_sorted:
+        proteinPositions = sorted(proteinPositions)
 
     return (
         ";".join(map(str, matchedProteins)),
