@@ -46,6 +46,7 @@ class KinaseLibraryAnnotator:
         self.sort_type = sort_type
         self.odds_dict = None
         self.quantiles = None
+        self.allowed_aa_characters = None
 
     def load_annotations(self) -> None:
         """Reads in tab separated file with motif and quantile annotations."""
@@ -53,6 +54,8 @@ class KinaseLibraryAnnotator:
             self.motifs_file, sep="\t", index_col=["Kinase", "Position", "AA"]
         )
         self.odds_dict = odds_df["Odds Ratio"].to_dict()
+
+        self.allowed_aa_characters = set(odds_df.index.get_level_values('AA'))
 
         quantile_matrix_df = pd.read_csv(
             self.quantiles_file, sep="\t", index_col="Score"
@@ -80,6 +83,10 @@ class KinaseLibraryAnnotator:
             pd.DataFrame: annotated dataframe
 
         """
+
+        # Throw an error if any sequence contains illegal characters
+        df["Site sequence context"].apply(self.validate_sequence)
+
         annotated_df = df
         if not inplace:
             annotated_df = df.copy()
@@ -112,6 +119,11 @@ class KinaseLibraryAnnotator:
         )
 
         return annotated_df
+
+    def validate_sequence(self, seq):
+        invalid_chars = set(seq) - self.allowed_aa_characters
+        if invalid_chars:
+            raise ValueError(f"Sequence '{seq}' contains invalid characters: {''.join(invalid_chars)}")
 
 
 def _find_upstream_kinase(

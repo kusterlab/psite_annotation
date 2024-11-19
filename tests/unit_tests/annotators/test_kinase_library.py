@@ -267,7 +267,7 @@ class TestKinaseLibraryAnnotator:
 
         pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
 
-    
+
     def test_annotate_exact_context(
         self,
         annotator,
@@ -368,6 +368,24 @@ class TestKinaseLibraryAnnotator:
 
         pd.testing.assert_frame_equal(input_df, expected_output_df, check_like=True)
 
+    def test_raise_error_on_illegal_char(self, annotator):
+        """Test that an error is raised if the "Site sequence context" column contains non-AA characters.
+
+        Args:
+            annotator: Annotator object with mock file loaded
+        """
+        annotator.load_annotations()
+
+        input_df = pd.DataFrame(
+            {
+                "Site sequence context": [
+                    "YLLP;AIVHI"
+                ],
+            }
+        )
+
+        with pytest.raises(ValueError):
+            annotator.annotate(input_df)
 
 # Define the mock input file as a string
 mock_motifs_input_file = """Kinase	Position	AA	Odds Ratio
