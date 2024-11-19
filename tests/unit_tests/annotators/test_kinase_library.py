@@ -284,7 +284,6 @@ class TestKinaseLibraryAnnotator:
 
         pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
 
-
     def test_annotate_exact_context(
         self,
         annotator,
@@ -313,12 +312,11 @@ class TestKinaseLibraryAnnotator:
             "Motif Totals",
         }
 
-        print(output_df.to_dict(orient="list"))
-
         # Assert that the output dataframe has the expected values
         pd.testing.assert_frame_equal(
             output_df, expected_output_df_exact_context, check_like=True
         )
+        
     def test_annotate_too_short_context(
         self,
         annotator,
