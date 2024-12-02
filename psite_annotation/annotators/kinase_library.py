@@ -5,6 +5,18 @@ import numpy as np
 
 from .annotator_base import check_columns
 
+ALLOWED_AA_CHARACTERS = {'A', 'C', 'D', 'E', 'F',
+                         'G', 'H', 'I', 'K', 'L',
+                         'M', 'N', 'P', 'Q', 'R',
+                         'S', 'T', 'V', 'W', 'Y',
+                         's', 't', 'y', '_'}
+
+
+def validate_sequence(seq):
+    invalid_chars = set(seq) - ALLOWED_AA_CHARACTERS
+    if invalid_chars:
+        raise ValueError(f"Sequence '{seq}' contains invalid characters: {''.join(invalid_chars)}")
+
 
 class KinaseLibraryAnnotator:
     """Annotate pandas dataframe with highest scoring kinases from the kinase library.
@@ -28,6 +40,7 @@ class KinaseLibraryAnnotator:
         quantiles_file: Union[str, IO],
         top_n: int = 5,
         score_cutoff: float = 3,
+        split_sequences: bool = False,
         threshold_type="total",
         sort_type="total",
     ):
@@ -43,6 +56,7 @@ class KinaseLibraryAnnotator:
         self.top_n = top_n
         self.score_cutoff = score_cutoff
         self.threshold_type = threshold_type
+        self.split_sequences = split_sequences
         self.sort_type = sort_type
         self.odds_dict = None
         self.quantiles = None
@@ -80,20 +94,32 @@ class KinaseLibraryAnnotator:
             pd.DataFrame: annotated dataframe
 
         """
+
         annotated_df = df
         if not inplace:
             annotated_df = df.copy()
 
-        def adjust_context_length(sequence_context, desired_length=11):
-            if len(sequence_context) > desired_length:
-                excess = (len(sequence_context) - desired_length) // 2
-                res = sequence_context[excess: excess + desired_length]
-            elif len(sequence_context) < desired_length:
-                padding_length = (desired_length - len(sequence_context)) // 2
-                res = '_' * padding_length + sequence_context + '_' * padding_length
+        if self.split_sequences:
+            annotated_df['Site sequence context'] = annotated_df['Site sequence context'].apply(lambda s: s.split(';'))
+            annotated_df = annotated_df.explode('Site sequence context')
+
+        # Throw an error if any sequence contains illegal characters
+        annotated_df["Site sequence context"].apply(validate_sequence)
+
+        def adjust_context_length(sequence, desired_length=11):
+            # Edge case: Empty sequences are converted into '_' - they will not receive any kinases or scores
+            if sequence == '':
+                sequence = '_'
+
+            if len(sequence) > desired_length:
+                excess = (len(sequence) - desired_length) // 2
+                res = sequence[excess: excess + desired_length]
+            elif len(sequence) < desired_length:
+                padding_length = (desired_length - len(sequence)) // 2
+                res = '_' * padding_length + sequence + '_' * padding_length
             else:
-                res = sequence_context
-            return res[:desired_length//2] + res[desired_length//2].lower() + res[(desired_length//2)+1:].upper()
+                res = sequence
+            return res[:desired_length//2].upper() + res[desired_length//2].lower() + res[(desired_length//2)+1:].upper()
 
         site_sequence_plus_minus_5 = annotated_df["Site sequence context"].apply(adjust_context_length)
 
@@ -143,7 +169,7 @@ def _find_upstream_kinase(
     (kinases, scores, percentiles, totals)
     each is a string with semicolon sorted values
     """
-    if len(seq) == 0:
+    if len(seq) == 0 or seq == len(seq) * '_':
         return pd.Series(["", "", "", ""])
 
     # Map the different parameter options
@@ -201,7 +227,8 @@ def _score(seq, kinase, P, motif_size=5):
     """
     Score the motife based on the AA positional ODDS matrix given a sequence and a kinase
     """
-    assert len(seq) == (2 * motif_size + 1)
+    assert len(seq) == (2 * motif_size + 1), \
+        f'Sequence expected to have length {(2 * motif_size + 1)} but had length {len(seq)} instead'
     score = 1.0
     for i, aa in enumerate(seq):
         pos = i - motif_size

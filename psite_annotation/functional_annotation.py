@@ -425,6 +425,7 @@ def addKinaseLibraryAnnotations(
     sort_type="total",
     threshold_type="total",
     score_cutoff: float = 3,
+    split_sequences: bool = False
 ):
     """Annotate pandas dataframe with highest scoring kinases from the kinase library.
 
@@ -458,6 +459,7 @@ def addKinaseLibraryAnnotations(
         sort_type: score by which to sort the kinases, one of "percentile", "score" or "total" (default: "total")
         threshold_type: score to which to apply the cutoff, one of "percentile", "score" or "total" (total=score*percentile) (default: "total")
         score_cutoff: do not report kinases with a score below this cutoff (default: 3.0)
+        split_sequences: if set to True, the 'Site sequence context' column is split by ';' and exploded before annotating
 
     Returns:
         pd.DataFrame: annotated dataframe
@@ -470,6 +472,7 @@ def addKinaseLibraryAnnotations(
         sort_type=sort_type,
         threshold_type=threshold_type,
         score_cutoff=score_cutoff,
+        split_sequences=split_sequences,
     )
     annotator.load_annotations()
     df = annotator.annotate(df)
