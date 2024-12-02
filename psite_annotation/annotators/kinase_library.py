@@ -169,7 +169,7 @@ def _find_upstream_kinase(
     (kinases, scores, percentiles, totals)
     each is a string with semicolon sorted values
     """
-    if len(seq) == 0:
+    if len(seq) == 0 or seq == len(seq) * '_':
         return pd.Series(["", "", "", ""])
 
     # Map the different parameter options
