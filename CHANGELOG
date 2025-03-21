@@ -1,3 +1,16 @@
+v0.6.0
+- Fix GitHub action artifact up/download version
+- Handle multiple flanking sequences in addKinaseLibraryAnnotations (#20, #21)
+- Hard-code return empty result for empty sequence
+- Fix IndexError in get_site_sequence_contenxt (#18, #19)
+- Re-add uniqueness and sorting as optional features (#16, #17)
+- Add length check to _score function
+- Add parameter to split multiple flanking sequences by ';'
+- Throw error for illegal characters in site sequence context
+- Preserve order within annotation columns (#14, #15)
+- Fix bug in trimming (#12, #13)
+- Implement function to correctly adjust sequence length prior to motif enrichment
+
 v0.5.3
 - Speed optimizations for kinase library motif analysis
 - Add kinase library arguments to functional annotation function
