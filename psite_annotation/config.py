@@ -6,16 +6,16 @@ from config_path import ConfigPath
 logger = logging.getLogger(__name__)
 
 default_config_json = """{
-    "domainMappingFile": "Z:/line_functions/bioinformatics/Databases/psite_annotation_mapping/uniprot_to_domain.csv",
-    "inVitroKinaseSubstrateMappingFile": "Z:/line_functions/bioinformatics/Databases/psite_annotation_mapping/yasushi_supp_table2_kinase_substrate_relations_mapped_ids.tsv",
-    "motifsFile": "Z:/line_functions/bioinformatics/Databases/psite_annotation_mapping/motifs_all.tsv",
-    "turnoverFile": "Z:/line_functions/bioinformatics/Databases/psite_annotation_mapping/TurnoverSites.csv",
-    "pspFastaFile": "Z:/line_functions/bioinformatics/Databases/psite_annotation_mapping/PhosphoSitePlus/Phosphosite_seq.fasta",
-    "pspKinaseSubstrateFile": "Z:/line_functions/bioinformatics/Databases/psite_annotation_mapping/PhosphoSitePlus/Kinase_Substrate_Dataset",
-    "pspAnnotationFile": "Z:/line_functions/bioinformatics/Databases/psite_annotation_mapping/PhosphoSitePlus/Phosphorylation_site_dataset",
-    "pspRegulatoryFile": "Z:/line_functions/bioinformatics/Databases/psite_annotation_mapping/PhosphoSitePlus/Regulatory_sites",
-    "kinaseLibraryMotifsFile": "Z:/line_functions/bioinformatics/Databases/psite_annotation_mapping/Motif_Odds_Ratios.txt",
-    "kinaseLibraryQuantilesFile": "Z:/line_functions/bioinformatics/Databases/psite_annotation_mapping/Kinase_Score_Quantile_Matrix.txt"
+    "domainMappingFile": "./uniprot_to_domain.csv",
+    "inVitroKinaseSubstrateMappingFile": "./yasushi_supp_table2_kinase_substrate_relations_mapped_ids.tsv",
+    "motifsFile": "./motifs_all.tsv",
+    "turnoverFile": "./TurnoverSites.csv",
+    "pspFastaFile": "./PhosphoSitePlus/Phosphosite_seq.fasta",
+    "pspKinaseSubstrateFile": "./PhosphoSitePlus/Kinase_Substrate_Dataset",
+    "pspAnnotationFile": "./PhosphoSitePlus/Phosphorylation_site_dataset",
+    "pspRegulatoryFile": "./PhosphoSitePlus/Regulatory_sites",
+    "kinaseLibraryMotifsFile": "./Motif_Odds_Ratios.txt",
+    "kinaseLibraryQuantilesFile": "./Kinase_Score_Quantile_Matrix.txt"
 }"""
 
 
