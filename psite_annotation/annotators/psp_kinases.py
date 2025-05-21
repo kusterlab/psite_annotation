@@ -15,7 +15,12 @@ class PSPKinasesAnnotator:
             df = annotator.annotate(df)
     """
 
-    def __init__(self, annotation_file: str, output_gene_names: bool = False):
+    def __init__(
+        self,
+        annotation_file: str,
+        output_gene_names: bool = False,
+        organism: str = "human",
+    ):
         """
         Initialize the input files and options for PSPKinasesAnnotator.
 
@@ -27,13 +32,16 @@ class PSPKinasesAnnotator:
         self.annotation_file = annotation_file
         self.output_gene_names = output_gene_names
         self.psp_df = None
+        self.organism = organism
 
     def load_annotations(self) -> None:
         """Reads in tab separated file with PhosphositePlus annotations."""
-        self.psp_df = pd.read_csv(self.annotation_file, sep="\t", skiprows=3, encoding='utf-8')
+        self.psp_df = pd.read_csv(
+            self.annotation_file, sep="\t", skiprows=3, encoding="utf-8"
+        )
         self.psp_df = self.psp_df[
-            (self.psp_df["KIN_ORGANISM"] == "human")
-            & (self.psp_df["SUB_ORGANISM"] == "human")
+            (self.psp_df["KIN_ORGANISM"] == self.organism)
+            & (self.psp_df["SUB_ORGANISM"] == self.organism)
         ]
 
         # format: O75822_S11
@@ -58,7 +66,7 @@ class PSPKinasesAnnotator:
         """Adds column with phosphorylating kinases.
 
         Adds the following annotation columns to dataframe\:
-        
+
         - PSP Kinases = all phosphorylating kinases according to PhosphoSitePlus, no distinction is made between
           in vivo and in vitro evidence (this can be added in the future, if necessary)
 

@@ -15,7 +15,7 @@ class PSPRegulatoryAnnotator:
             df = annotator.annotate(df)
     """
 
-    def __init__(self, annotation_file: str):
+    def __init__(self, annotation_file: str, organism: str = "human"):
         """
         Initialize the input files and options for PSPRegulatoryAnnotator.
 
@@ -25,12 +25,15 @@ class PSPRegulatoryAnnotator:
         """
         self.annotation_file = annotation_file
         self.psp_df = None
+        self.organism = organism
 
     def load_annotations(self) -> None:
         """Reads in tab separated file with PhosphositePlus annotations and stores it as a dictionary."""
-        self.psp_df = pd.read_csv(self.annotation_file, sep="\t", skiprows=3, encoding='utf-8')
+        self.psp_df = pd.read_csv(
+            self.annotation_file, sep="\t", skiprows=3, encoding="utf-8"
+        )
 
-        self.psp_df = self.psp_df[self.psp_df["ORGANISM"] == "human"]
+        self.psp_df = self.psp_df[self.psp_df["ORGANISM"] == self.organism]
 
         # format: O75822_S11
         self.psp_df["Site positions"] = (
@@ -63,7 +66,7 @@ class PSPRegulatoryAnnotator:
         """Adds columns with number of studies.
 
         Adds the following annotation columns to dataframe\:
-        
+
         - PSP_ON_FUNCTION = functional annotations for downstream regulation
         - PSP_ON_PROCESS = process annotations for downstream regulation
         - PSP_ON_PROT_INTERACT = protein interactions

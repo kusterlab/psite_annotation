@@ -5,7 +5,6 @@ from typing import Dict
 import pandas as pd
 
 from . import annotators
-from .annotators.annotator_base import check_columns
 from .config import _getConfigDicts, _getConfigSetting
 
 logger = logging.getLogger(__name__)
@@ -61,8 +60,9 @@ def addPeptideAndPsitePositions(
     context_right: int = 15,
     retain_other_mods: bool = False,
     mod_dict: Dict[str, str] = None,
-        return_unique: bool = False,
-        return_sorted: bool = False,
+    return_unique: bool = False,
+    return_sorted: bool = False,
+    organism: str = "human",
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
 
@@ -116,6 +116,7 @@ def addPeptideAndPsitePositions(
         mod_dict=mod_dict,
         return_unique=return_unique,
         return_sorted=return_sorted,
+        organism=organism,
     )
     peptide_position_annotator.load_annotations()
     df = peptide_position_annotator.annotate(df)
@@ -128,6 +129,7 @@ def addPeptideAndPsitePositions(
         retain_other_mods=retain_other_mods,
         return_unique=return_unique,
         return_sorted=return_sorted,
+        organism=organism,
     )
     site_seq_context_annotator.load_annotations()
     df = site_seq_context_annotator.annotate(df)
@@ -144,6 +146,7 @@ def addSiteSequenceContext(
     retain_other_mods: bool = False,
     return_unique: bool = False,
     return_sorted: bool = False,
+    organism: str = "human",
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with sequence context of a p-site.
 
@@ -176,6 +179,7 @@ def addSiteSequenceContext(
         retain_other_mods=retain_other_mods,
         return_unique=return_unique,
         return_sorted=return_sorted,
+        organism=organism,
     )
     annotator.load_annotations()
     df = annotator.annotate(df)
@@ -215,7 +219,9 @@ def addTurnoverRates(df: pd.DataFrame, turnoverFile: str) -> pd.DataFrame:
     return df
 
 
-def addPSPAnnotations(df: pd.DataFrame, phosphoSitePlusFile: str) -> pd.DataFrame:
+def addPSPAnnotations(
+    df: pd.DataFrame, phosphoSitePlusFile: str, organism: str = "human"
+) -> pd.DataFrame:
     """Annotate pandas dataframe with number of high and low-throughput studies according to PhosphositePlus.
 
     Adds the following annotation columns to dataframe\:
@@ -241,7 +247,7 @@ def addPSPAnnotations(df: pd.DataFrame, phosphoSitePlusFile: str) -> pd.DataFram
         pd.DataFrame: annotated dataframe
 
     """
-    annotator = annotators.PSPStudiesAnnotator(phosphoSitePlusFile)
+    annotator = annotators.PSPStudiesAnnotator(phosphoSitePlusFile, organism=organism)
     annotator.load_annotations()
     df = annotator.annotate(df)
 
@@ -249,7 +255,7 @@ def addPSPAnnotations(df: pd.DataFrame, phosphoSitePlusFile: str) -> pd.DataFram
 
 
 def addPSPRegulatoryAnnotations(
-    df: pd.DataFrame, phosphoSitePlusRegulatoryFile: str
+    df: pd.DataFrame, phosphoSitePlusRegulatoryFile: str, organism: str = "human"
 ) -> pd.DataFrame:
     """Annotate pandas dataframe with regulatory functions according to PhosphositePlus.
 
@@ -278,7 +284,9 @@ def addPSPRegulatoryAnnotations(
         pd.DataFrame: annotated dataframe
 
     """
-    annotator = annotators.PSPRegulatoryAnnotator(phosphoSitePlusRegulatoryFile)
+    annotator = annotators.PSPRegulatoryAnnotator(
+        phosphoSitePlusRegulatoryFile, organism=organism
+    )
     annotator.load_annotations()
     df = annotator.annotate(df)
 
@@ -286,8 +294,11 @@ def addPSPRegulatoryAnnotations(
 
 
 def addPSPKinaseSubstrateAnnotations(
-    df: pd.DataFrame, phosphoSitePlusKinaseSubstrateFile: str, gene_name: bool = False
-):
+    df: pd.DataFrame,
+    phosphoSitePlusKinaseSubstrateFile: str,
+    gene_name: bool = False,
+    organism: str = "human",
+) -> pd.DataFrame:
     """Annotate pandas dataframe with upstream kinases according to PhosphositePlus.
 
     Adds the following annotation columns to dataframe\:
@@ -313,7 +324,9 @@ def addPSPKinaseSubstrateAnnotations(
 
     """
     annotator = annotators.PSPKinasesAnnotator(
-        phosphoSitePlusKinaseSubstrateFile, output_gene_names=gene_name
+        phosphoSitePlusKinaseSubstrateFile,
+        output_gene_names=gene_name,
+        organism=organism,
     )
     annotator.load_annotations()
     df = annotator.annotate(df)
@@ -321,7 +334,7 @@ def addPSPKinaseSubstrateAnnotations(
     return df
 
 
-def addDomains(df: pd.DataFrame, domainMappingFile: str):
+def addDomains(df: pd.DataFrame, domainMappingFile: str) -> pd.DataFrame:
     """Adds column with domains the peptide overlaps with.
 
     Adds the following annotation columns to dataframe\:
@@ -352,7 +365,7 @@ def addDomains(df: pd.DataFrame, domainMappingFile: str):
     return df
 
 
-def addMotifs(df: pd.DataFrame, motifsFile: str):
+def addMotifs(df: pd.DataFrame, motifsFile: str) -> pd.DataFrame:
     """Adds column with motifs the site sequence context matches with.
 
     Adds the following annotation columns to dataframe\:
@@ -383,7 +396,9 @@ def addMotifs(df: pd.DataFrame, motifsFile: str):
     return df
 
 
-def addInVitroKinases(df: pd.DataFrame, inVitroKinaseSubstrateMappingFile: str):
+def addInVitroKinases(
+    df: pd.DataFrame, inVitroKinaseSubstrateMappingFile: str
+) -> pd.DataFrame:
     """Annotate pandas dataframe with upstream in vitro kinases according to Sugiyama et al (2019).
 
     https://www.nature.com/articles/s41598-019-46385-4
@@ -425,8 +440,8 @@ def addKinaseLibraryAnnotations(
     sort_type="total",
     threshold_type="total",
     score_cutoff: float = 3,
-    split_sequences: bool = False
-):
+    split_sequences: bool = False,
+) -> pd.DataFrame:
     """Annotate pandas dataframe with highest scoring kinases from the kinase library.
 
     Johnson et al. 2023, https://doi.org/10.1038/s41586-022-05575-3

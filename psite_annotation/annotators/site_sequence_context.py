@@ -31,6 +31,7 @@ class SiteSequenceContextAnnotator:
         retain_other_mods: bool = False,
         return_unique: bool=False,
         return_sorted: bool=False,
+        organism: str = "human",
     ):
         """
         Initialize the input files and options for PeptidePositionAnnotator.
@@ -51,6 +52,7 @@ class SiteSequenceContextAnnotator:
         self.retain_other_mods = retain_other_mods
         self.return_unique = return_unique
         self.return_sorted = return_sorted
+        self.organism = organism
 
     def load_annotations(self) -> None:
         """Reads in protein sequences from fasta file."""
@@ -59,7 +61,7 @@ class SiteSequenceContextAnnotator:
             readFasta = _read_fasta_phosphositeplus
 
         self.protein_sequences = collections.defaultdict(str)
-        for proteinId, seq in readFasta(self.annotation_file):
+        for proteinId, seq in readFasta(self.annotation_file, organism=self.organism):
             self.protein_sequences[proteinId] = seq
 
     @check_columns(["Site positions"])

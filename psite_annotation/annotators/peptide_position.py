@@ -38,8 +38,9 @@ class PeptidePositionAnnotator:
         returnAllPotentialSites: bool = False,
         localization_uncertainty: int = 0,
         mod_dict: Dict[str, str] = MOD_DICT,
-            return_unique: bool = False,
-            return_sorted: bool = False,
+        return_unique: bool = False,
+        return_sorted: bool = False,
+        organism: str = "human",
     ) -> None:
         """
         Initialize the input files and options for PeptidePositionAnnotator.
@@ -60,6 +61,7 @@ class PeptidePositionAnnotator:
         self.mod_dict = mod_dict
         self.return_unique = return_unique
         self.return_sorted = return_sorted
+        self.organism = organism
 
     def load_annotations(self) -> None:
         """Reads in protein sequences from fasta file."""
@@ -68,7 +70,7 @@ class PeptidePositionAnnotator:
             readFasta = _read_fasta_phosphositeplus
 
         self.protein_sequences = collections.defaultdict(str)
-        for proteinId, seq in readFasta(self.annotation_file):
+        for proteinId, seq in readFasta(self.annotation_file, organism=self.organism):
             self.protein_sequences[proteinId] = seq
 
     @check_columns(["Proteins", "Modified sequence"])
@@ -76,7 +78,7 @@ class PeptidePositionAnnotator:
         """Adds columns regarding the peptide position within the protein to a pandas dataframe.
 
         Adds the following annotation columns to dataframe\:
-        
+
         - 'Matched proteins' = subset of 'Proteins' in the input column in which the protein could indeed be found. If
           the same peptide is found multiple times, the protein identifier will be repeated.
         - 'Start positions' = starting positions of the modified peptide in the protein sequence (1-based, methionine is
@@ -173,8 +175,8 @@ def _get_peptide_positions(
     protein_sequences: Dict[str, str],
     mod_peptide_sequence: str,
     returnAllPotentialSites: bool = False,
-        return_unique: bool = False,
-        return_sorted: bool = False,
+    return_unique: bool = False,
+    return_sorted: bool = False,
     localization_uncertainty: int = 0,
     mod_dict: Dict[str, str] = MOD_DICT,
     mod_regex: Pattern = _get_mod_regex(MOD_DICT),
@@ -274,7 +276,7 @@ def parse_uniprot_id(fasta_id: str) -> str:
         return protein_id
 
 
-def _read_fasta_maxquant(file_path, parse_id=parse_uniprot_id):
+def _read_fasta_maxquant(file_path, parse_id=parse_uniprot_id, organism: str = "human"):
     name, seq = None, []
     with open(file_path) as fp:
         for line in itertools.chain(fp, [">"]):
@@ -289,7 +291,9 @@ def _read_fasta_maxquant(file_path, parse_id=parse_uniprot_id):
                 seq.append(line)
 
 
-def _read_fasta_phosphositeplus(file_path, parse_id=lambda x: x.split("|")[3]):
+def _read_fasta_phosphositeplus(
+    file_path, parse_id=lambda x: x.split("|")[3], organism: str = "human"
+):
     name, seq = None, []
     with open(file_path, encoding="latin-1") as fp:
         next(fp)
@@ -303,7 +307,7 @@ def _read_fasta_phosphositeplus(file_path, parse_id=lambda x: x.split("|")[3]):
 
                 if len(line) > 1:
                     name, seq = parse_id(line[1:]), []
-                    if line[1:].split("|")[2] != "human":
+                    if line[1:].split("|")[2] != organism:
                         name = False
             else:
                 seq.append(line)
@@ -320,9 +324,11 @@ def _apply_localization_uncertainty(
     ]
     return "".join(
         [
-            aa.lower()
-            if aa in potential_mods.upper() and x in potential_mod_positions
-            else aa
+            (
+                aa.lower()
+                if aa in potential_mods.upper() and x in potential_mod_positions
+                else aa
+            )
             for x, aa in enumerate(mod_peptide_sequence)
         ]
     )

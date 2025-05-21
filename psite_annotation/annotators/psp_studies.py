@@ -15,7 +15,7 @@ class PSPStudiesAnnotator:
             df = annotator.annotate(df)
     """
 
-    def __init__(self, annotation_file: str):
+    def __init__(self, annotation_file: str, organism: str = "human"):
         """
         Initialize the input files and options for PSPStudiesAnnotator.
 
@@ -25,6 +25,7 @@ class PSPStudiesAnnotator:
         """
         self.annotation_file = annotation_file
         self.psp_df = None
+        self.organism = organism
 
     def load_annotations(self) -> None:
         """Reads in tab separated file with PhosphositePlus annotations and stores it as a dictionary."""
@@ -32,7 +33,7 @@ class PSPStudiesAnnotator:
             self.annotation_file, sep="\t", skiprows=3, encoding="utf-8"
         )
 
-        self.psp_df = self.psp_df[self.psp_df["ORGANISM"] == "human"]
+        self.psp_df = self.psp_df[self.psp_df["ORGANISM"] == self.organism]
 
         self.psp_df[["LT_LIT", "MS_LIT", "MS_CST"]] = (
             self.psp_df[["LT_LIT", "MS_LIT", "MS_CST"]].fillna(0).astype(int)
