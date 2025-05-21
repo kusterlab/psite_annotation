@@ -1,19 +1,13 @@
 import collections
 import itertools
 import re
-from typing import Dict
+from typing import Dict, Pattern, Tuple
 
 import pandas as pd
 
 from .annotator_base import check_columns
 
 MOD_DICT = {
-    "K(ac)": "k",
-    "K( GlyGly (K) without TMT)": "k",
-    "K( GlyGly )": "k",
-    "K(GlyGly)": "k",
-    "C(dbia)": "c",
-    "K(Acetyl (K))": "k",
     "S(ph)": "s",
     "T(ph)": "t",
     "Y(ph)": "y",
@@ -23,23 +17,18 @@ MOD_DICT = {
     "pS": "s",
     "pT": "t",
     "pY": "y",
-    "(ac)": "",
-    "(Acetyl (Protein N-term))": "",
-    "(ox)": "",
-    "(Oxidation (M))": "",
-    "_": "",
 }
-MOD_REGEX = re.compile("|".join(map(re.escape, MOD_DICT.keys())))
-MOD_PATTERN = re.compile(r"([cksty])")
 
 
 class PeptidePositionAnnotator:
     """Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
 
-    Typical usage example:
-      annotator = PeptidePositionAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+
+            annotator = PeptidePositionAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(
@@ -48,9 +37,11 @@ class PeptidePositionAnnotator:
         pspInput: bool = False,
         returnAllPotentialSites: bool = False,
         localization_uncertainty: int = 0,
-        mod_regex=MOD_REGEX,
-        mod_pattern=MOD_PATTERN,
-    ):
+        mod_dict: Dict[str, str] = MOD_DICT,
+        return_unique: bool = False,
+        return_sorted: bool = False,
+        organism: str = "human",
+    ) -> None:
         """
         Initialize the input files and options for PeptidePositionAnnotator.
 
@@ -60,7 +51,6 @@ class PeptidePositionAnnotator:
             returnAllPotentialSites: return all modifiable positions within the peptide as potential p-sites.
             localization_uncertainty: return all modifiable positions within n positions of modified sites as potential p-sites.
             mod_regex: regex to capture all modification strings
-            mod_pattern: regex to capture all single letter modifications
 
         """
         self.annotation_file = annotation_file
@@ -68,8 +58,10 @@ class PeptidePositionAnnotator:
         self.returnAllPotentialSites = returnAllPotentialSites
         self.localization_uncertainty = localization_uncertainty
         self.protein_sequences = None
-        self.mod_regex = mod_regex
-        self.mod_pattern = mod_pattern
+        self.mod_dict = mod_dict
+        self.return_unique = return_unique
+        self.return_sorted = return_sorted
+        self.organism = organism
 
     def load_annotations(self) -> None:
         """Reads in protein sequences from fasta file."""
@@ -78,14 +70,15 @@ class PeptidePositionAnnotator:
             readFasta = _read_fasta_phosphositeplus
 
         self.protein_sequences = collections.defaultdict(str)
-        for proteinId, seq in readFasta(self.annotation_file):
+        for proteinId, seq in readFasta(self.annotation_file, organism=self.organism):
             self.protein_sequences[proteinId] = seq
 
     @check_columns(["Proteins", "Modified sequence"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds columns regarding the peptide position within the protein to a pandas dataframe.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+
         - 'Matched proteins' = subset of 'Proteins' in the input column in which the protein could indeed be found. If
           the same peptide is found multiple times, the protein identifier will be repeated.
         - 'Start positions' = starting positions of the modified peptide in the protein sequence (1-based, methionine is
@@ -107,6 +100,9 @@ class PeptidePositionAnnotator:
         if not inplace:
             annotated_df = df.copy()
 
+        mod_regex = _get_mod_regex(self.mod_dict)
+        mod_pattern = _get_mod_pattern(self.mod_dict)
+        potential_mods = _get_single_letter_mods(self.mod_dict)
         annotated_df[
             [
                 "Matched proteins",
@@ -116,13 +112,17 @@ class PeptidePositionAnnotator:
             ]
         ] = annotated_df[["Proteins", "Modified sequence"]].apply(
             lambda x: _get_peptide_positions(
-                x["Proteins"],
-                self.protein_sequences,
-                x["Modified sequence"],
-                self.returnAllPotentialSites,
-                self.localization_uncertainty,
-                self.mod_regex,
-                self.mod_pattern,
+                proteinIds=x["Proteins"],
+                protein_sequences=self.protein_sequences,
+                mod_peptide_sequence=x["Modified sequence"],
+                return_unique=self.return_unique,
+                return_sorted=self.return_sorted,
+                returnAllPotentialSites=self.returnAllPotentialSites,
+                localization_uncertainty=self.localization_uncertainty,
+                mod_dict=self.mod_dict,
+                mod_regex=mod_regex,
+                mod_pattern=mod_pattern,
+                potential_mods=potential_mods,
             ),
             axis=1,
             result_type="expand",
@@ -130,8 +130,44 @@ class PeptidePositionAnnotator:
         return annotated_df
 
 
-def _make_maxquant_mods_consistent(text, mod_regex=MOD_REGEX):
-    return mod_regex.sub(lambda match: MOD_DICT[match.group(0)], text)
+def _get_single_letter_mods(mod_dict: Dict[str, str]) -> str:
+    """Get a string of all single letter modifications
+
+    Args:
+        mod_regex (Dict[str, str]): _description_
+    """
+    return "".join([x for x in mod_dict.values() if len(x) == 1])
+
+
+def _get_mod_pattern(mod_dict: Dict[str, str]) -> Pattern:
+    """Create regex to capture all single letter modifications
+
+    Args:
+        mod_regex (Dict[str, str]): _description_
+    """
+    single_letter_mods = _get_single_letter_mods(mod_dict)
+    return re.compile(r"([" + single_letter_mods + "])")
+
+
+def _get_mod_regex(mod_dict: Dict[str, str]) -> Pattern:
+    return re.compile("|".join(map(re.escape, mod_dict.keys())))
+
+
+def _remove_modifications(mod_peptide_sequence: str) -> str:
+    # Define the regex pattern to match any content between the outermost parentheses
+    pattern = re.compile(r"\(([^()]|\([^()]*\))*\)")
+
+    while re.search(pattern, mod_peptide_sequence):
+        # Use the sub function to replace the matched pattern with an empty string iteratively
+        mod_peptide_sequence = re.sub(pattern, "", mod_peptide_sequence)
+
+    return mod_peptide_sequence.replace("_", "")
+
+
+def _make_maxquant_mods_consistent(
+    text: str, mod_dict: Dict[str, str], mod_regex: Pattern
+) -> str:
+    return mod_regex.sub(lambda match: mod_dict[match.group(0)], text)
 
 
 def _get_peptide_positions(
@@ -139,28 +175,28 @@ def _get_peptide_positions(
     protein_sequences: Dict[str, str],
     mod_peptide_sequence: str,
     returnAllPotentialSites: bool = False,
+    return_unique: bool = False,
+    return_sorted: bool = False,
     localization_uncertainty: int = 0,
-    mod_regex=MOD_REGEX,
-    mod_pattern=MOD_PATTERN,
-):
+    mod_dict: Dict[str, str] = MOD_DICT,
+    mod_regex: Pattern = _get_mod_regex(MOD_DICT),
+    mod_pattern: Pattern = _get_mod_pattern(MOD_DICT),
+    potential_mods: str = _get_single_letter_mods(MOD_DICT),
+) -> Tuple[str, str, str, str]:
     if str(proteinIds) == "nan" or len(mod_peptide_sequence) == 0:
         return ("", "", "", "")
 
     mod_peptide_sequence = _make_maxquant_mods_consistent(
-        mod_peptide_sequence, mod_regex
+        mod_peptide_sequence, mod_dict, mod_regex
     )
+    mod_peptide_sequence = _remove_modifications(mod_peptide_sequence)
+
+    if returnAllPotentialSites:
+        localization_uncertainty = len(mod_peptide_sequence)
 
     if localization_uncertainty > 0:
         mod_peptide_sequence = _apply_localization_uncertainty(
-            mod_peptide_sequence, localization_uncertainty
-        )
-
-    if returnAllPotentialSites:
-        mod_peptide_sequence = re.sub(
-            r"[STYK]", lambda x: x.group().lower(), mod_peptide_sequence
-        )
-        mod_peptide_sequence = re.sub(
-            r"[c]", lambda x: x.group().upper(), mod_peptide_sequence
+            mod_peptide_sequence, localization_uncertainty, potential_mods
         )
 
     matchedProteins, startPositions, endPositions, proteinPositions = (
@@ -198,11 +234,17 @@ def _get_peptide_positions(
 
                 proteinPositions.append(site_position_string)
 
+    if return_unique:
+        proteinPositions = set(proteinPositions)
+
+    if return_sorted:
+        proteinPositions = sorted(proteinPositions)
+
     return (
         ";".join(map(str, matchedProteins)),
         ";".join(map(str, startPositions)),
         ";".join(map(str, endPositions)),
-        ";".join(sorted(set(proteinPositions))),
+        ";".join(map(str, proteinPositions)),
     )
 
 
@@ -234,7 +276,7 @@ def parse_uniprot_id(fasta_id: str) -> str:
         return protein_id
 
 
-def _read_fasta_maxquant(file_path, parse_id=parse_uniprot_id):
+def _read_fasta_maxquant(file_path, parse_id=parse_uniprot_id, organism: str = "human"):
     name, seq = None, []
     with open(file_path) as fp:
         for line in itertools.chain(fp, [">"]):
@@ -249,7 +291,9 @@ def _read_fasta_maxquant(file_path, parse_id=parse_uniprot_id):
                 seq.append(line)
 
 
-def _read_fasta_phosphositeplus(file_path, parse_id=lambda x: x.split("|")[3]):
+def _read_fasta_phosphositeplus(
+    file_path, parse_id=lambda x: x.split("|")[3], organism: str = "human"
+):
     name, seq = None, []
     with open(file_path, encoding="latin-1") as fp:
         next(fp)
@@ -263,14 +307,14 @@ def _read_fasta_phosphositeplus(file_path, parse_id=lambda x: x.split("|")[3]):
 
                 if len(line) > 1:
                     name, seq = parse_id(line[1:]), []
-                    if line[1:].split("|")[2] != "human":
+                    if line[1:].split("|")[2] != organism:
                         name = False
             else:
                 seq.append(line)
 
 
 def _apply_localization_uncertainty(
-    mod_peptide_sequence: str, localization_uncertainty: int
+    mod_peptide_sequence: str, localization_uncertainty: int, potential_mods: str
 ) -> str:
     mod_positions = [idx for idx, aa in enumerate(mod_peptide_sequence) if aa.islower()]
     potential_mod_positions = [
@@ -280,9 +324,11 @@ def _apply_localization_uncertainty(
     ]
     return "".join(
         [
-            aa.lower()
-            if aa in ["S", "T", "Y", "K"] and x in potential_mod_positions
-            else aa
+            (
+                aa.lower()
+                if aa in potential_mods.upper() and x in potential_mod_positions
+                else aa
+            )
             for x, aa in enumerate(mod_peptide_sequence)
         ]
     )

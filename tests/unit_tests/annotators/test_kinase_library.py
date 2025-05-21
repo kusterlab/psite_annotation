@@ -4,7 +4,7 @@ import pandas as pd
 import pytest
 from psite_annotation.annotators.annotator_base import MissingColumnsError
 
-from psite_annotation.annotators.kinase_library import KinaseLibraryAnnotator
+from psite_annotation.annotators.kinase_library import KinaseLibraryAnnotator, _score
 
 
 @pytest.fixture
@@ -72,18 +72,149 @@ def expected_output_df() -> pd.DataFrame:
                 "",
             ],
             "Motif Percentiles": [
-                "0.946;0.262",
+                "0.946;0.261",
                 "0.638",
                 "0.675",
                 "",
                 "",
             ],
             "Motif Totals": [
-                "0.487;-0.746",
+                "0.487;-0.745",
                 "-0.871",
                 "-0.792",
                 "",
                 "",
+            ],
+        }
+    )
+
+@pytest.fixture
+def input_df_exact_context() -> pd.DataFrame:
+    """Fixture to create an example input dataframe to the annotate() method.
+
+    Returns:
+        pd.DataFrame: Example input dataframe
+
+    """
+    return pd.DataFrame(
+        {
+            "Site sequence context": [
+                "AGGRGsGPGRR",
+                "AGGRGsTYGPG",
+                "GGRGStYGPGR",
+                "GRGSTyGPGRR",
+                "GRGSTyGPGRR",
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def expected_output_df_exact_context() -> pd.DataFrame:
+    """Fixture to create an example ouput dataframe to the annotate() method given the input_df fixture.
+
+    Returns:
+        pd.DataFrame: Output dataframe corresponding to input_df fixture
+
+    """
+    return pd.DataFrame(
+        {
+            "Site sequence context": [
+                "AGGRGsGPGRR",
+                "AGGRGsTYGPG",
+                "GGRGStYGPGR",
+                "GRGSTyGPGRR",
+                "GRGSTyGPGRR",
+            ],
+            "Motif Kinases": [
+                "AAK1;ACVR2A",
+                "ACVR2A",
+                "ACVR2A",
+                "",
+                "",
+            ],
+            "Motif Scores": [
+                "0.515;-2.848",
+                "-1.365",
+                "-1.174",
+                "",
+                "",
+            ],
+            "Motif Percentiles": [
+                "0.946;0.261",
+                "0.638",
+                "0.675",
+                "",
+                "",
+            ],
+            "Motif Totals": [
+                "0.487;-0.745",
+                "-0.871",
+                "-0.792",
+                "",
+                "",
+            ],
+        }
+    )
+
+@pytest.fixture
+def input_df_too_short_context() -> pd.DataFrame:
+    """Fixture to create an example input dataframe to the annotate() method.
+
+    Returns:
+        pd.DataFrame: Example input dataframe
+
+    """
+    return pd.DataFrame(
+        {
+            "Site sequence context": [
+                "GRGsGPG",
+                "GRGsTYG",
+                "RGStYGP",
+                "GSTyGPG",
+                "GSTyGPG",
+            ],
+        }
+    )
+
+
+@pytest.fixture
+def expected_output_df_too_short_context() -> pd.DataFrame:
+    """Fixture to create an example ouput dataframe to the annotate() method given the input_df fixture.
+
+    Returns:
+        pd.DataFrame: Output dataframe corresponding to input_df fixture
+
+    """
+    return pd.DataFrame(
+        {
+            "Site sequence context": [
+                "GRGsGPG",
+                "GRGsTYG",
+                "RGStYGP",
+                "GSTyGPG",
+                "GSTyGPG",
+            ],
+            "Motif Kinases": ["AAK1;ACVR2A", "ACVR2A", "ACVR2A", "", ""],
+            "Motif Scores": ["0.782;-2.476", "-1.619", "-0.67", "", ""],
+            "Motif Percentiles": ["0.952;0.354", "0.581", "0.752", "", ""],
+            "Motif Totals": ["0.745;-0.876", "-0.94", "-0.504", "", ""],
+        }
+    )
+
+@pytest.fixture
+def input_df_multiple_seq() -> pd.DataFrame:
+    """Fixture to create an example input dataframe with multiple ';'-separated site sequence contexts
+
+    Returns:
+        pd.DataFrame: Example input dataframe
+
+    """
+    return pd.DataFrame(
+        {
+            "Site sequence context": [
+                "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE;AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG;AAAAAAAGAAGGRGStYGPGRRRHLVPGAGG",
+                "AAAAAAGAAGGRGSTyGPGRRRHLVPGAGGE;AAAAAAGAAGGRGSTyGPGRRRHLVPGAGGE",
             ],
         }
     )
@@ -153,6 +284,72 @@ class TestKinaseLibraryAnnotator:
 
         pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
 
+    def test_annotate_exact_context(
+        self,
+        annotator,
+        input_df_exact_context,
+        expected_output_df_exact_context,
+    ):
+        """Test that the annotate method correctly adds the motif annotations to the input dataframe as new column.
+
+        Args:
+            annotator: Annotator object with mock file loaded
+            input_df: Example input dataframe
+            expected_output_df: Expected output dataframe
+
+        """
+        annotator.load_annotations()
+
+        # Annotate the input dataframe
+        output_df = annotator.annotate(input_df_exact_context)
+
+        # Assert that the output dataframe has the expected columns
+        assert set(output_df.columns) == {
+            "Site sequence context",
+            "Motif Kinases",
+            "Motif Scores",
+            "Motif Percentiles",
+            "Motif Totals",
+        }
+
+        # Assert that the output dataframe has the expected values
+        pd.testing.assert_frame_equal(
+            output_df, expected_output_df_exact_context, check_like=True
+        )
+
+    def test_annotate_too_short_context(
+        self,
+        annotator,
+        input_df_too_short_context,
+        expected_output_df_too_short_context,
+    ):
+        """Test that the annotate method correctly adds the motif annotations to the input dataframe as new column.
+
+        Args:
+            annotator: Annotator object with mock file loaded
+            input_df: Example input dataframe
+            expected_output_df: Expected output dataframe
+
+        """
+        annotator.load_annotations()
+
+        # Annotate the input dataframe
+        output_df = annotator.annotate(input_df_too_short_context)
+
+        # Assert that the output dataframe has the expected columns
+        assert set(output_df.columns) == {
+            "Site sequence context",
+            "Motif Kinases",
+            "Motif Scores",
+            "Motif Percentiles",
+            "Motif Totals",
+        }
+
+        # Assert that the output dataframe has the expected values
+        pd.testing.assert_frame_equal(
+            output_df, expected_output_df_too_short_context, check_like=True
+        )
+
     def test_annotate_input_df_unchanged(self, annotator, input_df):
         """Test that the annotate method does not alter the input dataframe.
 
@@ -185,6 +382,67 @@ class TestKinaseLibraryAnnotator:
         annotator.annotate(input_df, inplace=True)
 
         pd.testing.assert_frame_equal(input_df, expected_output_df, check_like=True)
+
+    def test_raise_error_on_illegal_char(self, annotator, input_df_multiple_seq):
+        """Test that an error is raised if the "Site sequence context" column contains non-AA characters.
+        If 'split_sequences' is not set to True, the ';' is considered an illegal character.
+        Args:
+            annotator: Annotator object with mock file loaded
+            input_df_multiple_seq: Example input dataframe with ';' in the "Site sequence context" column
+        """
+        annotator.load_annotations()
+
+        with pytest.raises(ValueError):
+            annotator.annotate(input_df_multiple_seq)
+
+    def test_annotate_split_multiple_seq(self, annotator, input_df_multiple_seq, expected_output_df):
+        """Test that the annotate method correctly splits up ';'-separated sequences before annotation, if requested.
+
+        Args:
+            annotator: Annotator object with mock file loaded
+            input_df_multiple_seq: Example input dataframe with ';'-split "Site sequence context"
+            expected_output_df: Expected output dataframe
+
+        """
+        annotator.split_sequences = True
+
+        annotator.load_annotations()
+
+        output_df = annotator.annotate(input_df_multiple_seq)
+
+        #In order for the output to be equal to the expected output, we need to drop the index
+        output_df.reset_index(inplace=True, drop=True)
+
+        pd.testing.assert_frame_equal(output_df, expected_output_df, check_like=True)
+
+    def test_raise_error_on_too_short_sequence(self):
+        """Test that the _score function throws an error if the submitted sequence does not have the length:
+         (2 * motif_size + 1)"""
+        with pytest.raises(AssertionError):
+            _score('SHORT', None, None, 5)
+
+    def test_annotate_empty_seq(self, annotator):
+        """Test that the annotate method correctly annotated empty input sequences with no scores
+
+        Args:
+            annotator: Annotator object with mock file loaded
+
+        """
+
+        df = pd.DataFrame({'Site sequence context': ['', '_']})
+        annotator.load_annotations()
+
+        output_df = annotator.annotate(df)
+
+        expected_empty_output_df = pd.DataFrame({
+            "Site sequence context": ['', '_'],
+            "Motif Kinases": ['', ''],
+            "Motif Scores": ['', ''],
+            "Motif Percentiles": ['', ''],
+            "Motif Totals": ['', ''],
+        })
+
+        pd.testing.assert_frame_equal(output_df, expected_empty_output_df, check_like=True)
 
 
 # Define the mock input file as a string

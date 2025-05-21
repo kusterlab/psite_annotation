@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "psite-annotation"
-version = "0.5.0"
+version = "0.6.1"
 description = "Module for annotating p-sites based on resources such as PhosphoSitePlus"
 authors = ["Matthew The <matthew.the@tum.de>", "Amirhossein Sakhteman <amirhossein.sakhteman@tum.de>", "Florian P. Bayer <f.bayer@tum.de>"]
 license= "Apache-2.0"
@@ -8,7 +8,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
-numpy = "^1.18.1"
+numpy = ">=1.18.1,<3.0"
 pandas = ">=1.3.0"
 config-path = "1.0.3"
 scipy = "^1.11.3"
@@ -25,6 +25,7 @@ flake8-docstrings = "^1.7.0"
 flake8-bugbear = "^23.1.20"
 flake8-bandit = "^4.1.1"
 darglint = "^1.8.1"
+ipykernel = "^6.29.2"
 
 [build-system]
 requires = ["poetry>=1.5.1"]

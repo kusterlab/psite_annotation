@@ -13,10 +13,12 @@ class DomainAnnotator:
     Requires 'Matched proteins', 'Start positions', 'End positions' columns in the dataframe to be annotated.
     The 'Matched proteins', 'Start positions', 'End positions' columns can be generated with PeptidePositionAnnotator().
 
-    Typical usage example:
-      annotator = DomainAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+
+            annotator = DomainAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(self, annotation_file: Union[str, IO]):
@@ -48,7 +50,8 @@ class DomainAnnotator:
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds column with domains the peptide overlaps with.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+
         - Domains = semicolon separated list of domains that overlap with the peptide
 
         Args:
@@ -65,7 +68,15 @@ class DomainAnnotator:
 
         annotated_df["Domains"] = df[
             ["Matched proteins", "Start positions", "End positions"]
-        ].apply(lambda x: _get_domains(x[0], self.domain_dict, x[1], x[2]), axis=1)
+        ].apply(
+            lambda x: _get_domains(
+                x["Matched proteins"],
+                self.domain_dict,
+                x["Start positions"],
+                x["End positions"],
+            ),
+            axis=1,
+        )
 
         return annotated_df
 
@@ -100,7 +111,7 @@ def _get_domains(
         endPositions.split(";"),
     ):
         startPos, endPos = int(startPos), int(endPos)
-        for (domainStartPos, domainEndPos, domainName) in domainDict.get(proteinId, []):
+        for domainStartPos, domainEndPos, domainName in domainDict.get(proteinId, []):
             if startPos < domainEndPos and endPos > domainStartPos:
                 domains.append(domainName)
 

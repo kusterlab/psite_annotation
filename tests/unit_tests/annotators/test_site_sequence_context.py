@@ -135,7 +135,7 @@ def expected_output_df_custom_context() -> pd.DataFrame:
             ],
             "Site sequence context": [
                 "HRAGStKDAG",
-                "GRGSEsIKIP;MCGRGsESIK",
+                "MCGRGsESIK;GRGSEsIKIP",
                 "",
                 "TMFSWsEQNG",
                 "",
@@ -328,7 +328,79 @@ class TestGetSiteSequenceContexts:
 
         assert (
             pa._get_site_sequence_contexts(site_position_string, proteinSequences)
+            == "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE;AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE"
+        )
+
+    def test_get_site_sequence_contexts_last_aa(self, proteinSequences):
+        """Test the _get_site_sequence_contexts function with the p-site on the last amino acid of the protein sequence.
+
+        Args:
+            proteinSequences: dictionary of UniProt identifiers to protein sequences
+
+        """
+        site_position_string = "Q86U42_Y306"
+
+        assert (
+            pa._get_site_sequence_contexts(site_position_string, proteinSequences)
+            == "RVYRGRARATSWYSPy_______________"
+        )
+
+    def test_get_site_sequence_contexts_wrong_aa(self, proteinSequences):
+        """Test the _get_site_sequence_contexts function with an out of bounds p-site position.
+
+        Args:
+            proteinSequences: dictionary of UniProt identifiers to protein sequences
+
+        """
+        site_position_string = "Q86U42_T19"  # position 19 is a serine
+
+        assert (
+            pa._get_site_sequence_contexts(site_position_string, proteinSequences) == ""
+        )
+
+    def test_get_site_sequence_contexts_out_of_bounds(self, proteinSequences):
+        """Test the _get_site_sequence_contexts function with an out of bounds p-site position.
+
+        Args:
+            proteinSequences: dictionary of UniProt identifiers to protein sequences
+
+        """
+        site_position_string = "Q86U42_Y307"
+
+        assert (
+            pa._get_site_sequence_contexts(site_position_string, proteinSequences) == ""
+        )
+
+    def test_get_site_sequence_contexts_unique(self, proteinSequences):
+        """Test the _get_site_sequence_contexts function with duplicate elimination.
+
+        Args:
+            proteinSequences: dictionary of UniProt identifiers to protein sequences
+
+        """
+        site_position_string = "Q86U42-2_S19;Q86U42_S19"
+
+        assert (
+            pa._get_site_sequence_contexts(
+                site_position_string, proteinSequences, return_unique=True
+            )
             == "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE"
+        )
+
+    def test_get_site_sequence_contexts_sorted(self, proteinSequences):
+        """Test the _get_site_sequence_contexts function with sorting of output
+
+        Args:
+            proteinSequences: dictionary of UniProt identifiers to protein sequences
+
+        """
+        site_position_string = "Q86U42_Y46;Q86U42_S19"
+
+        assert (
+            pa._get_site_sequence_contexts(
+                site_position_string, proteinSequences, return_sorted=True
+            )
+            == "AAAAAAAAGAAGGRGsGPGRRRHLVPGAGGE;AGGEAGEGAPGGAGDyGNGLESEELEPEELL"
         )
 
     def test_get_site_sequence_contexts_custom_context(self, proteinSequences):
@@ -344,7 +416,7 @@ class TestGetSiteSequenceContexts:
             pa._get_site_sequence_contexts(
                 site_position_string, proteinSequences, context_left=5, context_right=4
             )
-            == "AGGRGsGPGR"
+            == "AGGRGsGPGR;AGGRGsGPGR"
         )
 
     def test_get_site_sequence_contexts_all_potential_sites(
@@ -357,14 +429,15 @@ class TestGetSiteSequenceContexts:
 
         """
         site_position_string = (
-            "Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21;Q86U42_S19;Q86U42_T20;Q86U42_Y21"
+            "Q86U42_S19;Q86U42_T20;Q86U42_Y21;Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21"
         )
 
         assert (
             pa._get_site_sequence_contexts(
                 site_position_string, proteinSequencesExtraPhospho
             )
-            == "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG;AAAAAAAGAAGGRGStYGPGRRRHLVPGAGG;AAAAAAGAAGGRGSTyGPGRRRHLVPGAGGE"
+            == "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG;AAAAAAAGAAGGRGStYGPGRRRHLVPGAGG;AAAAAAGAAGGRGSTyGPGRRRHLVPGAGGE;"
+            + "AAAAAAAAGAAGGRGsTYGPGRRRHLVPGAG;AAAAAAAGAAGGRGStYGPGRRRHLVPGAGG;AAAAAAGAAGGRGSTyGPGRRRHLVPGAGGE"
         )
 
     def test_get_site_sequence_context_missing_protein(self):
@@ -372,6 +445,11 @@ class TestGetSiteSequenceContexts:
         proteinSequences = collections.defaultdict(str)
         sitePosString = "Q86U42_S19"
 
+        assert pa._get_site_sequence_contexts(sitePosString, proteinSequences) == ""
+
+    def test_get_site_sequence_context_out_of_bounds(self, proteinSequences):
+        """Test the _get_site_sequence_contexts function when the position is larger than the length of the sequence"""
+        sitePosString = "Q86U42_S307"  # (Q86U42 has length 306)
         assert pa._get_site_sequence_contexts(sitePosString, proteinSequences) == ""
 
 
@@ -413,7 +491,9 @@ class TestAddModificationToSequenceContext:
         assert result == "AGGRGsTYGPG"
 
     def test_wrong_amino_acid(self):
-        with pytest.raises(ValueError, match="Incorrect modified amino acid at position"):
+        with pytest.raises(
+            ValueError, match="Incorrect modified amino acid at position"
+        ):
             pa._add_modification_to_sequence_context(
                 "AGGRGsTYGPG",
                 "Q86U42-2_S19",
@@ -430,7 +510,6 @@ class TestUnpackSitePositionString:
     def test_invalid_format(self):
         with pytest.raises(ValueError, match="Invalid format for site_position_string"):
             pa._unpack_site_position_string("invalid_string")
-            
 
 
 # You may need to adjust the imports and module names based on your actual module structure.

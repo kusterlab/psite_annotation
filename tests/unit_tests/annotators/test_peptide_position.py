@@ -304,7 +304,7 @@ class TestGetPeptidePositions:
             "Q86U42;Q86U42-2",
             "1;1",
             "23;23",
-            "Q86U42-2_S19;Q86U42_S19",
+            "Q86U42_S19;Q86U42-2_S19",
         )
 
     def test_get_peptide_positions_multiple_occurrence(self, proteinSequences):
@@ -315,7 +315,7 @@ class TestGetPeptidePositions:
 
         """
         proteinIds = "Q86U42-X"
-        modPeptideSequence = "(ac)AAAAAAAAAAGAAGGRGS(ph)GPGR"
+        modPeptideSequence = "(ac)AAAAAA(random mod(with extra parentheses))AAAAGAAGGRGS(ph)GPGR"
 
         assert pa._get_peptide_positions(
             proteinIds, proteinSequences, modPeptideSequence
@@ -404,13 +404,44 @@ class TestGetPeptidePositions:
             "Q86U42;Q86U42-2",
             "1;1",
             "25;25",
-            "Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21;Q86U42_S19;Q86U42_T20;Q86U42_Y21",
+            "Q86U42_S19;Q86U42_T20;Q86U42_Y21;Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21",
         )
 
-    def test_get_peptide_positions_all_potential_sites(
+
+    # Not sure if this is ever desired behaviour, but it's how the old implementation would have handled it:
+    # Make the Site positions unique, but not the other three columns.
+    # I would either not add the set() at all, or add it to all four output columns
+    # The latter might produce undesired results for Start/End positions, if they agree but the Protein IDs are different
+    def test_get_peptide_positions_all_potential_sites_unique(
         self, proteinSequencesExtraPhospho
     ):
-        """Test the _get_peptide_positions function with two isoforms and the returnAllPotentialSites option.
+        """Test the _get_peptide_positions function with two isoforms and the returnAllPotentialSites option, eliminating duplicates.
+
+        Args:
+            proteinSequencesExtraPhospho: dictionary of UniProt identifiers to protein sequences
+
+        """
+        proteinIds = "Q86U42;Q86U42-2;Q86U42"
+        modPeptideSequence = "(ac)AAAAAAAAAAGAAGGRGS(ph)TYGPGR"
+
+        assert pa._get_peptide_positions(
+            proteinIds,
+            proteinSequencesExtraPhospho,
+            modPeptideSequence,
+            returnAllPotentialSites=True,
+            return_unique=True,
+            return_sorted=True
+        ) == (
+            "Q86U42;Q86U42-2;Q86U42",
+            "1;1;1",
+            "25;25;25",
+            'Q86U42-2_S19;Q86U42-2_T20;Q86U42-2_Y21;Q86U42_S19;Q86U42_T20;Q86U42_Y21',
+        )
+
+    def test_get_peptide_positions_all_potential_sites_sorted(
+        self, proteinSequencesExtraPhospho
+    ):
+        """Test the _get_peptide_positions function with two isoforms and the returnAllPotentialSites option, sorting sites alphabetically.
 
         Args:
             proteinSequencesExtraPhospho: dictionary of UniProt identifiers to protein sequences
@@ -424,6 +455,7 @@ class TestGetPeptidePositions:
             proteinSequencesExtraPhospho,
             modPeptideSequence,
             returnAllPotentialSites=True,
+            return_sorted=True
         ) == (
             "Q86U42;Q86U42-2",
             "1;1",
@@ -434,21 +466,57 @@ class TestGetPeptidePositions:
 
 class TestApplyLocalizationUncertainty:
     def test_apply_localization_uncertainty_no_change(self):
-        result = pa._apply_localization_uncertainty("THEPEPtPIDE", 1)
+        result = pa._apply_localization_uncertainty("THEPEPtPIDE", 1, "sty")
         assert result == "THEPEPtPIDE"
 
     def test_apply_localization_uncertainty_one_change(self):
-        result = pa._apply_localization_uncertainty("THEPYPtSTDE", 1)
+        result = pa._apply_localization_uncertainty("THEPYPtSTDE", 1, "sty")
         assert result == "THEPYPtsTDE"
 
     def test_apply_localization_uncertainty_zero_uncertainty(self):
-        result = pa._apply_localization_uncertainty("THEPEPtSIDE", 0)
+        result = pa._apply_localization_uncertainty("THEPEPtSIDE", 0, "sty")
         assert result == "THEPEPtSIDE"
 
     def test_apply_localization_uncertainty_mixed_sequence(self):
-        result = pa._apply_localization_uncertainty("THEPETtsIDE", 1)
+        result = pa._apply_localization_uncertainty("THEPETtsIDE", 1, "sty")
         assert result == "THEPEttsIDE"
 
+    def test_apply_localization_uncertainty_start_of_sequence(self):
+        result = pa._apply_localization_uncertainty("tHEPETTSIDE", 5, "sty")
+        assert result == "tHEPEtTSIDE"
+
     def test_apply_localization_uncertainty_empty_sequence(self):
-        result = pa._apply_localization_uncertainty("", 1)
+        result = pa._apply_localization_uncertainty("", 1, "sty")
         assert result == ""
+
+
+class TestRemoveModifications:
+    def test_remove_modifications_simple(self):
+        peptide_sequence = "THEP(Acetyl)TIDE"
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == "THEPTIDE"
+
+    def test_remove_modifications_nested(self):
+        peptide_sequence = "THEP(Acetyl(Methyl(Oxidation)))TIDE"
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == "THEPTIDE"
+
+    def test_remove_modifications_multiple_modifications(self):
+        peptide_sequence = "THEP(Acetyl)TID(E)MOD"
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == "THEPTIDMOD"
+
+    def test_remove_modifications_no_modifications(self):
+        peptide_sequence = "THEPTIDE"
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == "THEPTIDE"
+
+    def test_remove_modifications_empty_input(self):
+        peptide_sequence = ""
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == ""
+
+    def test_remove_modifications_only_modifications(self):
+        peptide_sequence = "(Acetyl)"
+        cleaned_sequence = pa._remove_modifications(peptide_sequence)
+        assert cleaned_sequence == ""

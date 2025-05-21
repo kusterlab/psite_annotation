@@ -9,10 +9,12 @@ class InVitroKinasesAnnotator:
 
     https://www.nature.com/articles/s41598-019-46385-4
 
-    Typical usage example:
-      annotator = InVitroKinasesAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+            
+            annotator = InVitroKinasesAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(self, annotation_file: str):
@@ -44,7 +46,8 @@ class InVitroKinasesAnnotator:
     def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
         """Adds column with phosphorylating kinases.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+        
         - In Vitro Kinases = all phosphorylating kinases according to the Sugiyama in vitro kinase-substrate study
 
         Args:

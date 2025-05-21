@@ -14,10 +14,12 @@ SITE_POSITION_PATTERN = re.compile(r"[a-zA-Z\-0-9]*_[A-Z][0-9]*")
 class SiteSequenceContextAnnotator:
     """Annotate pandas dataframe with +/- 15 amino acids around each of the modified sites, separated by semicolons.
 
-    Typical usage example:
-      annotator = SiteSequenceContextAnnotator(<path_to_annotation_file>)
-      annotator.load_annotations()
-      df = annotator.annotate(df)
+    Example:
+        ::
+        
+            annotator = SiteSequenceContextAnnotator(<path_to_annotation_file>)
+            annotator.load_annotations()
+            df = annotator.annotate(df)
     """
 
     def __init__(
@@ -27,6 +29,9 @@ class SiteSequenceContextAnnotator:
         context_left: int = 15,
         context_right: int = 15,
         retain_other_mods: bool = False,
+        return_unique: bool=False,
+        return_sorted: bool=False,
+        organism: str = "human",
     ):
         """
         Initialize the input files and options for PeptidePositionAnnotator.
@@ -45,6 +50,9 @@ class SiteSequenceContextAnnotator:
         self.context_left = context_left
         self.context_right = context_right
         self.retain_other_mods = retain_other_mods
+        self.return_unique = return_unique
+        self.return_sorted = return_sorted
+        self.organism = organism
 
     def load_annotations(self) -> None:
         """Reads in protein sequences from fasta file."""
@@ -53,14 +61,15 @@ class SiteSequenceContextAnnotator:
             readFasta = _read_fasta_phosphositeplus
 
         self.protein_sequences = collections.defaultdict(str)
-        for proteinId, seq in readFasta(self.annotation_file):
+        for proteinId, seq in readFasta(self.annotation_file, organism=self.organism):
             self.protein_sequences[proteinId] = seq
 
     @check_columns(["Site positions"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
         """Adds columns regarding the peptide position within the protein to a pandas dataframe.
 
-        Adds the following annotation columns to dataframe:
+        Adds the following annotation columns to dataframe\:
+        
         - 'Site sequence context' = +/- 15 amino acids around each of the modified sites, separated by semicolons
 
         Args:
@@ -82,13 +91,19 @@ class SiteSequenceContextAnnotator:
                 context_left=self.context_left,
                 context_right=self.context_right,
                 retain_other_mods=self.retain_other_mods,
+                return_unique=self.return_unique,
+                return_sorted=self.return_sorted,
             )
         )
         return annotated_df
 
 
 def _get_site_sequence_contexts(
-    site_position_string: str, protein_sequences: Dict[str, str], **kwargs
+        site_position_string: str,
+        protein_sequences: Dict[str, str],
+        return_unique: bool = False,
+        return_sorted: bool = False,
+        **kwargs
 ) -> str:
     if len(site_position_string) == 0:
         return ""
@@ -100,7 +115,14 @@ def _get_site_sequence_contexts(
         ),
         site_position_strings,
     )
-    return ";".join(sorted(set(contexts)))
+
+    if return_unique:
+        contexts = set(contexts)
+
+    if return_sorted:
+        contexts = sorted(contexts)
+
+    return ";".join(contexts)
 
 
 def _get_site_sequence_context(
@@ -130,7 +152,7 @@ def _get_site_sequence_context(
     proteinLength = len(protein_sequences[proteinId])
     if (
         proteinLength == 0
-        or sitePos > proteinLength
+        or sitePos >= proteinLength
         or protein_sequences[proteinId][sitePos].lower() != mod
     ):
         return ""
@@ -198,7 +220,7 @@ def _add_modification_to_sequence_context(
     )
 
 
-def _unpack_site_position_string(site_position_string: str) -> Tuple[str, str, str]:
+def _unpack_site_position_string(site_position_string: str) -> Tuple[str, int, str]:
     if not re.match(SITE_POSITION_PATTERN, site_position_string):
         raise ValueError(
             f"Invalid format for site_position_string: {site_position_string}"
