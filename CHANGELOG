@@ -1,3 +1,6 @@
+v0.6.1
+- Add support for other organisms (#10)
+
 v0.6.0
 - Fix GitHub action artifact up/download version
 - Handle multiple flanking sequences in addKinaseLibraryAnnotations (#20, #21)
