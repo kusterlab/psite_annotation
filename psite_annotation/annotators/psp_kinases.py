@@ -63,7 +63,7 @@ class PSPKinasesAnnotator:
 
     @check_columns(["Site positions"])
     def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Adds column with phosphorylating kinases.
+        r"""Adds column with phosphorylating kinases.
 
         Adds the following annotation columns to dataframe\:
 

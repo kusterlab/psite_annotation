@@ -40,15 +40,14 @@ class ModifiedSequenceGroupAnnotator:
 
     @check_columns(["Modified sequence"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
-        """
-        Group delocalized phospho-forms.
+        r"""Group delocalized phospho-forms.
 
         This function identifies peptide sequences that differ only by the position
         of their phosphorylation (`(ph)`) group and collapses them into
         "delocalized" groups. Each group contains all modified sequence variants
         that represent the same underlying peptide backbone.
 
-        The following columns are added to the dataframe:
+        The following columns are added to the dataframe\:
 
         - 'Delocalized sequence' = Canonical unmodified backbone with an index
         suffix to distinguish the number of modifications.
@@ -205,7 +204,7 @@ def delocalize_phospho_sequence(mod_seqs: pd.Series) -> pd.Series:
     ph_count = mod_seqs.str.count("(ph)").replace(np.nan, 0)
     # De-localize
     mod_seqs = (
-        mod_seqs.str.replace("\(ph\)", "", regex=True)
+        mod_seqs.str.replace(r"\(ph\)", "", regex=True)
         + "_"
         + ph_count.astype(int).astype(str)
     )

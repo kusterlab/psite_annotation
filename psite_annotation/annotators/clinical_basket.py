@@ -34,7 +34,7 @@ class ClinicalBasketAnnotator:
         self.basket_df = None
 
     def load_annotations(self) -> None:
-        """Reads in excel file with basket-gene annotations.
+        r"""Reads in excel file with basket-gene annotations.
 
         Creates a dataframe `basket_df` with two columns\:
 
@@ -62,7 +62,7 @@ class ClinicalBasketAnnotator:
 
     @check_columns(["Gene names"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
-        """Adds column with baskets the gene names correspond to.
+        r"""Adds column with baskets the gene names correspond to.
 
         Adds the following annotation columns to dataframe\:
         

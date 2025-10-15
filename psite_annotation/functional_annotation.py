@@ -65,7 +65,7 @@ def addPeptideAndPsitePositions(
     return_sorted: bool = False,
     organism: str = "human",
 ) -> pd.DataFrame:
-    """Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
+    r"""Annotate pandas dataframe with positions of the peptide within the protein sequence based on a fasta file.
 
     Adds the following annotation columns to dataframe\:
 
@@ -149,7 +149,7 @@ def addSiteSequenceContext(
     return_sorted: bool = False,
     organism: str = "human",
 ) -> pd.DataFrame:
-    """Annotate pandas dataframe with sequence context of a p-site.
+    r"""Annotate pandas dataframe with sequence context of a p-site.
 
     Adds the following annotation columns to dataframe\:
 
@@ -189,7 +189,7 @@ def addSiteSequenceContext(
 
 
 def addTurnoverRates(df: pd.DataFrame, turnoverFile: str) -> pd.DataFrame:
-    """Annotate pandas dataframe with PTM turnover behavior.
+    r"""Annotate pandas dataframe with PTM turnover behavior.
 
     Adds column regarding the PTM turnover behavior.
 
@@ -223,7 +223,7 @@ def addTurnoverRates(df: pd.DataFrame, turnoverFile: str) -> pd.DataFrame:
 def addPSPAnnotations(
     df: pd.DataFrame, phosphoSitePlusFile: str, organism: str = "human"
 ) -> pd.DataFrame:
-    """Annotate pandas dataframe with number of high and low-throughput studies according to PhosphositePlus.
+    r"""Annotate pandas dataframe with number of high and low-throughput studies according to PhosphositePlus.
 
     Adds the following annotation columns to dataframe\:
 
@@ -258,7 +258,7 @@ def addPSPAnnotations(
 def addPSPRegulatoryAnnotations(
     df: pd.DataFrame, phosphoSitePlusRegulatoryFile: str, organism: str = "human"
 ) -> pd.DataFrame:
-    """Annotate pandas dataframe with regulatory functions according to PhosphositePlus.
+    r"""Annotate pandas dataframe with regulatory functions according to PhosphositePlus.
 
     Adds the following annotation columns to dataframe\:
 
@@ -300,7 +300,7 @@ def addPSPKinaseSubstrateAnnotations(
     gene_name: bool = False,
     organism: str = "human",
 ) -> pd.DataFrame:
-    """Annotate pandas dataframe with upstream kinases according to PhosphositePlus.
+    r"""Annotate pandas dataframe with upstream kinases according to PhosphositePlus.
 
     Adds the following annotation columns to dataframe\:
 
@@ -336,7 +336,7 @@ def addPSPKinaseSubstrateAnnotations(
 
 
 def addDomains(df: pd.DataFrame, domainMappingFile: str) -> pd.DataFrame:
-    """Adds column with domains the peptide overlaps with.
+    r"""Adds column with domains the peptide overlaps with.
 
     Adds the following annotation columns to dataframe\:
 
@@ -367,7 +367,7 @@ def addDomains(df: pd.DataFrame, domainMappingFile: str) -> pd.DataFrame:
 
 
 def addMotifs(df: pd.DataFrame, motifsFile: str) -> pd.DataFrame:
-    """Adds column with motifs the site sequence context matches with.
+    r"""Adds column with motifs the site sequence context matches with.
 
     Adds the following annotation columns to dataframe\:
 
@@ -400,7 +400,7 @@ def addMotifs(df: pd.DataFrame, motifsFile: str) -> pd.DataFrame:
 def addInVitroKinases(
     df: pd.DataFrame, inVitroKinaseSubstrateMappingFile: str
 ) -> pd.DataFrame:
-    """Annotate pandas dataframe with upstream in vitro kinases according to Sugiyama et al (2019).
+    r"""Annotate pandas dataframe with upstream in vitro kinases according to Sugiyama et al (2019).
 
     https://www.nature.com/articles/s41598-019-46385-4
 
@@ -443,7 +443,7 @@ def addKinaseLibraryAnnotations(
     score_cutoff: float = 3,
     split_sequences: bool = False,
 ) -> pd.DataFrame:
-    """Annotate pandas dataframe with highest scoring kinases from the kinase library.
+    r"""Annotate pandas dataframe with highest scoring kinases from the kinase library.
 
     Johnson et al. 2023, https://doi.org/10.1038/s41586-022-05575-3
 
@@ -503,7 +503,7 @@ def aggregateModifiedSequenceGroups(
     match_tolerance: int = 2,
     agg_func: str = "mean",
 ) -> pd.DataFrame:
-    """Annotate DataFrame with representative sequences from grouped localizations.
+    r"""Annotate DataFrame with representative sequences from grouped localizations.
 
     Requires "Modified sequence" column in the dataframe to be present.
 

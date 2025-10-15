@@ -42,15 +42,14 @@ class ModifiedSequenceAggregatorAnnotator:
 
     @check_columns(["Modified sequence", "Delocalized sequence", "Modified sequence group"])
     def annotate(self, df: pd.DataFrame, ) -> pd.DataFrame:
-        """
-        Group delocalized phospho-forms and aggregate their quantitative values.
+        r"""Group delocalized phospho-forms and aggregate their quantitative values.
 
         This function identifies peptide sequences that differ only by the position
         of their phosphorylation (`(ph)`) group and collapses them into
         "delocalized" groups. Each group contains all modified sequence variants
         that represent the same underlying peptide backbone.
 
-        The following columns are added to the dataframe:
+        The following columns are added to the dataframe\:
 
         - 'Modified sequence representative' = A single representative sequence
         selected from the group, i.e. the most frequently measured across experiments.
