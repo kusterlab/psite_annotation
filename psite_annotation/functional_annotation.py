@@ -1,6 +1,6 @@
 import logging
 import sys
-from typing import Dict
+from typing import Dict, Any
 
 import pandas as pd
 
@@ -490,6 +490,62 @@ def addKinaseLibraryAnnotations(
         split_sequences=split_sequences,
     )
     annotator.load_annotations()
+    df = annotator.annotate(df)
+
+    return df
+
+
+def aggregateModifiedSequenceGroups(
+    df: pd.DataFrame,
+    experiment_cols: list[str],
+    agg_cols: dict[str, Any] = None,
+    match_tolerance: int = 2,
+    agg_func: str = "mean",
+) -> pd.DataFrame:
+    """Annotate DataFrame with representative sequences from grouped localizations.
+
+    Requires "Modified sequence" column in the dataframe to be present.
+
+    Adds the following annotation columns to dataframe\:
+
+    - 'Delocalized sequence' = Canonical unmodified backbone with an index
+    suffix to distinguish the number of modifications.
+    - 'Modified sequence group' = All peptide variants belonging to the same
+    delocalized group, concatenated with semicolons.
+    - 'Modified sequence representative' = A single representative sequence
+    selected from the group, i.e. the most frequently measured across experiments.
+    - 'Modified sequence representative degree' = Fraction of summed observation
+    frequency contributed by the representative peptide.
+
+    All experiment columns (e.g. `"Experiment 1"`, `"Experiment 2"`, …) are aggregated
+    per group by summing the intensities of member sequences.
+    Example:
+        ::
+
+            df = pa.aggregateModifiedSequenceGroups(df)
+
+    Required columns:
+        :code:`Modified sequence`
+
+    Args:
+        df: pandas dataframe with 'Modified sequence' column
+        match_tolerance: group all modifiable positions within n positions of modified sites.
+        agg_func: function to aggregate quantitative values within each group, e.g. 'mean', 'sum', etc.        
+
+    Returns:
+        pd.DataFrame: annotated and aggregated dataframe
+
+    """
+    annotator = annotators.ModifiedSequenceGroupAnnotator(
+        match_tolerance=match_tolerance
+    )
+    df = annotator.annotate(df)
+
+    annotator = annotators.ModifiedSequenceAggregatorAnnotator(
+        experiment_cols=experiment_cols,
+        agg_func=agg_func,
+        agg_cols=agg_cols,
+    )
     df = annotator.annotate(df)
 
     return df
