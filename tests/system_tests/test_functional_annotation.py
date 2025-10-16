@@ -272,3 +272,101 @@ class TestAddKinaseLibraryAnnotations:
             ]["Motif Kinases"].values[0]
             == "CSNK1A1"
         )
+
+
+class TestAddModifiedSequenceGroups:
+    def test_addModifiedSequenceGroups(self, curves_df):
+        curves_df = pa.addModifiedSequenceGroups(curves_df)
+        # print(curves_df[curves_df["Modified sequence group"] != ""].head(n=100))
+
+        assert (
+            curves_df[curves_df["Modified sequence"] == "(ac)AASEAAVVS(ph)SPSLK"][
+                "Modified sequence group"
+            ].values[0]
+            == "(ac)AASEAAVVS(ph)SPSLK;(ac)AASEAAVVSS(ph)PSLK"
+        )
+
+        assert (
+            curves_df[curves_df["Modified sequence"] == "(ac)AAGTAAALAFLS(ph)QESR"][
+                "Modified sequence group"
+            ].values[0]
+            == "(ac)AAGTAAALAFLS(ph)QESR"
+        )
+
+    def test_addModifiedSequenceGroups_match_tolerance3(self, curves_df):
+        curves_df = pa.addModifiedSequenceGroups(curves_df, match_tolerance=3)
+        # print(curves_df[curves_df["Modified sequence group"] != ""].head(n=100))
+
+        assert (
+            curves_df[curves_df["Modified sequence"] == "(ac)AASEAAVVS(ph)SPSLK"][
+                "Modified sequence group"
+            ].values[0]
+            == "(ac)AASEAAVVS(ph)SPSLK;(ac)AASEAAVVSS(ph)PSLK"
+        )
+
+        assert (
+            curves_df[curves_df["Modified sequence"] == "(ac)AAGTAAALAFLS(ph)QESR"][
+                "Modified sequence group"
+            ].values[0]
+            == "(ac)AAGTAAALAFLS(ph)QESR;(ac)AAGTAAALAFLSQES(ph)R"
+        )
+
+
+class TestAggregateModifiedSequenceGroups:
+    def test_aggregateModifiedSequenceGroups(self, curves_df: pd.DataFrame):
+        curves_df = pa.aggregateModifiedSequenceGroups(
+            curves_df,
+            experiment_cols=curves_df.filter(
+                like="Reporter intensity corrected"
+            ).columns,
+        )
+        # print(curves_df[curves_df["Modified sequence group"] != ""].head(n=100))
+
+        assert len(curves_df) == 95
+
+        assert (
+            curves_df[
+                curves_df["Modified sequence group"]
+                == "(ac)AASEAAVVS(ph)SPSLK;(ac)AASEAAVVSS(ph)PSLK"
+            ]["Modified sequence representative"].values[0]
+            == "(ac)AASEAAVVS(ph)SPSLK"
+        )
+
+        assert (
+            curves_df[
+                curves_df["Modified sequence group"]
+                == "(ac)AAGTAAALAFLS(ph)QESR"
+            ]["Modified sequence representative"].values[0]
+            == "(ac)AAGTAAALAFLS(ph)QESR"
+        )
+
+    def test_aggregateModifiedSequenceGroups_match_tolerance3(
+        self, curves_df: pd.DataFrame
+    ):
+        curves_df = pa.aggregateModifiedSequenceGroups(
+            curves_df,
+            experiment_cols=curves_df.filter(
+                like="Reporter intensity corrected"
+            ).columns,
+            match_tolerance=3,
+        )
+        # print(curves_df[curves_df["Modified sequence group"] != ""].head(n=100))
+
+        assert len(curves_df) == 93
+
+        assert (
+            curves_df[
+                curves_df["Modified sequence group"]
+                == "(ac)AASEAAVVS(ph)SPSLK;(ac)AASEAAVVSS(ph)PSLK"
+            ]["Modified sequence representative"].values[0]
+            == "(ac)AASEAAVVS(ph)SPSLK"
+        )
+
+        assert (
+            curves_df[
+                curves_df["Modified sequence group"]
+                == "(ac)AAGTAAALAFLS(ph)QESR;(ac)AAGTAAALAFLSQES(ph)R"
+            ]["Modified sequence representative"].values[0]
+            == "(ac)AAGTAAALAFLS(ph)QESR"
+        )
+
