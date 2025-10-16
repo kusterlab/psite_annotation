@@ -496,6 +496,46 @@ def addKinaseLibraryAnnotations(
     return df
 
 
+def addModifiedSequenceGroups(
+    df: pd.DataFrame,
+    match_tolerance: int = 2,    
+) -> pd.DataFrame:
+    r"""Annotate DataFrame with representative sequences from grouped localizations.
+
+    Requires "Modified sequence" column in the dataframe to be present.
+
+    Adds the following annotation columns to dataframe\:
+
+    - 'Delocalized sequence' = Canonical unmodified backbone with an index
+    suffix to distinguish the number of modifications.
+    - 'Modified sequence group' = All peptide variants belonging to the same
+    delocalized group, concatenated with semicolons.
+
+    Example:
+        ::
+
+            df = pa.addModifiedSequenceGroups(df)
+
+    Required columns:
+        :code:`Modified sequence`
+
+    Args:
+        df: pandas dataframe with 'Modified sequence' column
+        match_tolerance: group all modifiable positions within n positions of modified sites.
+        agg_func: function to aggregate quantitative values within each group, e.g. 'mean', 'sum', etc.        
+
+    Returns:
+        pd.DataFrame: annotated and aggregated dataframe
+
+    """
+    annotator = annotators.ModifiedSequenceGroupAnnotator(
+        match_tolerance=match_tolerance
+    )
+    df = annotator.annotate(df)
+
+    return df
+
+
 def aggregateModifiedSequenceGroups(
     df: pd.DataFrame,
     experiment_cols: list[str],
@@ -503,7 +543,7 @@ def aggregateModifiedSequenceGroups(
     match_tolerance: int = 2,
     agg_func: str = "mean",
 ) -> pd.DataFrame:
-    r"""Annotate DataFrame with representative sequences from grouped localizations.
+    r"""Annotate and aggregate DataFrame with representative sequences from grouped localizations.
 
     Requires "Modified sequence" column in the dataframe to be present.
 
