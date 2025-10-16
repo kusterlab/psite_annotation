@@ -13,7 +13,7 @@ class ModifiedSequenceAggregatorAnnotator:
     Example:
         ::
 
-            annotator = ReprentativeModifiedSequenceAnnotator()
+            annotator = ModifiedSequenceAggregatorAnnotator()
             df = annotator.annotate(df)
     """
 
@@ -24,7 +24,7 @@ class ModifiedSequenceAggregatorAnnotator:
         agg_cols: dict[str, Any] = None,
     ) -> None:
         """
-        Initialize the options for ReprentativeModifiedSequenceAnnotator.
+        Initialize the options for ModifiedSequenceAggregatorAnnotator.
 
         Args:
             experiment_cols: list of column names with quantitative values.
@@ -51,10 +51,8 @@ class ModifiedSequenceAggregatorAnnotator:
 
         The following columns are added to the dataframe\:
 
-        - 'Modified sequence representative' = A single representative sequence
-        selected from the group, i.e. the most frequently measured across experiments.
-        - 'Modified sequence representative degree' = Fraction of summed observation
-        frequency contributed by the representative peptide.
+        - 'Modified sequence representative' = A single representative sequence selected from the group, i.e. the most frequently measured across experiments.
+        - 'Modified sequence representative degree' = Fraction of summed observation frequency contributed by the representative peptide.
 
         All experiment columns (e.g. `"Experiment 1"`, `"Experiment 2"`, …) are aggregated
         per group by summing the intensities of member sequences.

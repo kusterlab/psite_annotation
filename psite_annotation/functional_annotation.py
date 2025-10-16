@@ -507,10 +507,8 @@ def addModifiedSequenceGroups(
 
     Adds the following annotation columns to dataframe\:
 
-    - 'Delocalized sequence' = Canonical unmodified backbone with an index
-    suffix to distinguish the number of modifications.
-    - 'Modified sequence group' = All peptide variants belonging to the same
-    delocalized group, concatenated with semicolons.
+    - 'Delocalized sequence' = Canonical unmodified backbone with an index suffix to distinguish the number of modifications.
+    - 'Modified sequence group' = All peptide variants belonging to the same delocalized group, concatenated with semicolons.
 
     Example:
         ::
@@ -549,14 +547,10 @@ def aggregateModifiedSequenceGroups(
 
     Adds the following annotation columns to dataframe\:
 
-    - 'Delocalized sequence' = Canonical unmodified backbone with an index
-    suffix to distinguish the number of modifications.
-    - 'Modified sequence group' = All peptide variants belonging to the same
-    delocalized group, concatenated with semicolons.
-    - 'Modified sequence representative' = A single representative sequence
-    selected from the group, i.e. the most frequently measured across experiments.
-    - 'Modified sequence representative degree' = Fraction of summed observation
-    frequency contributed by the representative peptide.
+    - 'Delocalized sequence' = Canonical unmodified backbone with an index suffix to distinguish the number of modifications.
+    - 'Modified sequence group' = All peptide variants belonging to the same delocalized group, concatenated with semicolons.
+    - 'Modified sequence representative' = A single representative sequence selected from the group, i.e. the most frequently measured across experiments.
+    - 'Modified sequence representative degree' = Fraction of summed observation frequency contributed by the representative peptide.
 
     All experiment columns (e.g. `"Experiment 1"`, `"Experiment 2"`, …) are aggregated
     per group by summing the intensities of member sequences.

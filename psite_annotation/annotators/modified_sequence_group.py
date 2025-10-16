@@ -18,7 +18,7 @@ class ModifiedSequenceGroupAnnotator:
     Example:
         ::
 
-            annotator = DelocalizationAnnotator()
+            annotator = ModifiedSequenceGroupAnnotator()
             df = annotator.annotate(df)
     """
 
@@ -27,7 +27,7 @@ class ModifiedSequenceGroupAnnotator:
         match_tolerance: int = 2,
     ) -> None:
         """
-        Initialize the options for DelocalizationAnnotator.
+        Initialize the options for ModifiedSequenceGroupAnnotator.
 
         Args:
             match_tolerance: group all modifiable positions within n positions of modified sites.
@@ -49,10 +49,8 @@ class ModifiedSequenceGroupAnnotator:
 
         The following columns are added to the dataframe\:
 
-        - 'Delocalized sequence' = Canonical unmodified backbone with an index
-        suffix to distinguish the number of modifications.
-        - 'Modified sequence group' = All peptide variants belonging to the same
-        delocalized group, concatenated with semicolons.
+        - 'Delocalized sequence' = Canonical unmodified backbone with an index suffix to distinguish the number of modifications.
+        - 'Modified sequence group' = All peptide variants belonging to the same delocalized group, concatenated with semicolons.
 
         Args:
             df: Input dataframe with:
