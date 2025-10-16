@@ -60,7 +60,7 @@ class PSPStudiesAnnotator:
 
     @check_columns(["Site positions"])
     def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Adds columns with number of studies.
+        r"""Adds columns with number of studies.
 
         Adds the following annotation columns to dataframe\:
 

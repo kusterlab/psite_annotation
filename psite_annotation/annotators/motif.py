@@ -57,7 +57,7 @@ class MotifAnnotator:
 
     @check_columns(["Site sequence context"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
-        """Adds column with motifs the site sequence context matches with.
+        r"""Adds column with motifs the site sequence context matches with.
 
         Adds the following annotation columns to dataframe\:
         

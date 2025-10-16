@@ -1,3 +1,8 @@
+v0.7.0
+- Add support for modified sequence grouping and aggregating
+- Fix SyntaxWarning in docstrings
+- Expose 'annotators' submodule as part of the public API
+
 v0.6.1
 - Add support for other organisms (#10)
 

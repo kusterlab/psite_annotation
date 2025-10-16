@@ -58,7 +58,7 @@ class PTMTurnoverAnnotator:
 
     @check_columns(["Modified sequence"])
     def annotate(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Adds column regarding the PTM turnover behavior.
+        r"""Adds column regarding the PTM turnover behavior.
 
         Adds the following annotation columns to dataframe\:
         

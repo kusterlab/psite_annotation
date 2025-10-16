@@ -48,7 +48,7 @@ class DomainAnnotator:
 
     @check_columns(["Matched proteins", "Start positions", "End positions"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
-        """Adds column with domains the peptide overlaps with.
+        r"""Adds column with domains the peptide overlaps with.
 
         Adds the following annotation columns to dataframe\:
 

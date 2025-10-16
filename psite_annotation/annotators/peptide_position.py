@@ -75,7 +75,7 @@ class PeptidePositionAnnotator:
 
     @check_columns(["Proteins", "Modified sequence"])
     def annotate(self, df: pd.DataFrame, inplace: bool = False) -> pd.DataFrame:
-        """Adds columns regarding the peptide position within the protein to a pandas dataframe.
+        r"""Adds columns regarding the peptide position within the protein to a pandas dataframe.
 
         Adds the following annotation columns to dataframe\:
 
