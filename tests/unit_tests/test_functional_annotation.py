@@ -94,7 +94,66 @@ def modified_sequence_df() -> pd.DataFrame:
 
 
 @pytest.fixture
-def annotated_expected_df():
+def annotated_expected_df() -> pd.DataFrame:
+    df = pd.DataFrame(
+        {
+            "Modified sequence": [
+                "(ac)ASNSWNASSS(ph)PGEAREDGPEGLDK",
+                "(ac)ASNSWNASS(ph)SPGEAREDGPEGLDK",
+                "(ac)ASNSWNAS(ph)SSPGEAREDGPEGLDK",
+                "(ac)ASNS(ph)WNASSS(ph)PGEAREDGPEGLDK",
+                "(ac)ASNS(ph)WNASS(ph)SPGEAREDGPEGLDK",
+                "(ac)ASNS(ph)WNAS(ph)SSPGEAREDGPEGLDK",
+                "(ac)ASNS(ph)WNASSSPGEAREDGPEGLDK",
+                "(ac)AS(ph)NSWNASSSPGEAREDGPEGLDK",
+            ],
+            "Experiment 1": [10.0, np.nan, np.nan, np.nan, 10.0, np.nan, 5.0, np.nan],
+            "Experiment 2": [10.0, np.nan, np.nan, 10.0, np.nan, np.nan, 5.0, np.nan],
+            "Experiment 3": [np.nan, 10.0, np.nan, 10.0, np.nan, np.nan, np.nan, 5.0],
+            "Experiment 4": [10.0, np.nan, np.nan, 10.0, np.nan, np.nan, 5.0, np.nan],
+            "Experiment 5": [10.0, np.nan, np.nan, 10.0, np.nan, np.nan, 5.0, np.nan],
+            "Experiment 6": [np.nan, 10.0, np.nan, 10.0, np.nan, np.nan, 5.0, np.nan],
+            "Experiment 7": [np.nan, np.nan, 10.0, np.nan, 10.0, np.nan, 5.0, np.nan],
+            "Experiment 8": [10.0, np.nan, np.nan, 10.0, np.nan, np.nan, 5.0, np.nan],
+            "Experiment 9": [10.0, np.nan, np.nan, np.nan, np.nan, 10.0, 5.0, np.nan],
+            "Experiment 10": [np.nan, 10.0, np.nan, np.nan, 10.0, np.nan, 5.0, np.nan],
+            "Experiment 11": [10.0, np.nan, np.nan, 10.0, np.nan, np.nan, 5.0, np.nan],
+            "Experiment 12": [10.0, np.nan, np.nan, np.nan, np.nan, 10.0, 5.0, np.nan],
+            "Experiment 13": [np.nan, 10.0, np.nan, 10.0, 10.0, np.nan, 5.0, np.nan],
+            "Experiment 14": [np.nan, np.nan, 10.0, np.nan, 10.0, np.nan, 5.0, np.nan],
+            "Experiment 15": [10.0, np.nan, np.nan, 10.0, np.nan, np.nan, 5.0, np.nan],
+            "Experiment 16": [10.0, 10.0, np.nan, 10.0, np.nan, np.nan, np.nan, 5.0],
+            "Experiment 17": [10.0, np.nan, np.nan, 10.0, np.nan, np.nan, 5.0, np.nan],
+            "Experiment 18": [10.0, np.nan, np.nan, 10.0, np.nan, np.nan, 5.0, np.nan],
+            "Experiment 19": [np.nan, np.nan, 10.0, 10.0, np.nan, np.nan, 5.0, np.nan],
+            "Experiment 20": [10.0, 10.0, np.nan, 10.0, np.nan, np.nan, 5.0, np.nan],
+            "Delocalized sequence": [
+                "(ac)ASNSWNASSSPGEAREDGPEGLDK_1",
+                "(ac)ASNSWNASSSPGEAREDGPEGLDK_1",
+                "(ac)ASNSWNASSSPGEAREDGPEGLDK_1",
+                "(ac)ASNSWNASSSPGEAREDGPEGLDK_2",
+                "(ac)ASNSWNASSSPGEAREDGPEGLDK_2",
+                "(ac)ASNSWNASSSPGEAREDGPEGLDK_2",
+                "(ac)ASNSWNASSSPGEAREDGPEGLDK_1",
+                "(ac)ASNSWNASSSPGEAREDGPEGLDK_1",
+            ],
+            "Modified sequence group": [
+                "(ac)ASNSWNAS(ph)SSPGEAREDGPEGLDK;(ac)ASNSWNASS(ph)SPGEAREDGPEGLDK;(ac)ASNSWNASSS(ph)PGEAREDGPEGLDK",
+                "(ac)ASNSWNAS(ph)SSPGEAREDGPEGLDK;(ac)ASNSWNASS(ph)SPGEAREDGPEGLDK;(ac)ASNSWNASSS(ph)PGEAREDGPEGLDK",
+                "(ac)ASNSWNAS(ph)SSPGEAREDGPEGLDK;(ac)ASNSWNASS(ph)SPGEAREDGPEGLDK;(ac)ASNSWNASSS(ph)PGEAREDGPEGLDK",
+                "(ac)ASNS(ph)WNAS(ph)SSPGEAREDGPEGLDK;(ac)ASNS(ph)WNASS(ph)SPGEAREDGPEGLDK;(ac)ASNS(ph)WNASSS(ph)PGEAREDGPEGLDK",
+                "(ac)ASNS(ph)WNAS(ph)SSPGEAREDGPEGLDK;(ac)ASNS(ph)WNASS(ph)SPGEAREDGPEGLDK;(ac)ASNS(ph)WNASSS(ph)PGEAREDGPEGLDK",
+                "(ac)ASNS(ph)WNAS(ph)SSPGEAREDGPEGLDK;(ac)ASNS(ph)WNASS(ph)SPGEAREDGPEGLDK;(ac)ASNS(ph)WNASSS(ph)PGEAREDGPEGLDK",
+                "(ac)AS(ph)NSWNASSSPGEAREDGPEGLDK;(ac)ASNS(ph)WNASSSPGEAREDGPEGLDK",
+                "(ac)AS(ph)NSWNASSSPGEAREDGPEGLDK;(ac)ASNS(ph)WNASSSPGEAREDGPEGLDK",
+            ],
+        }
+    )
+    return df
+
+
+@pytest.fixture
+def aggregated_expected_df():
     return pd.DataFrame(
         {
             "Modified sequence group": [
@@ -141,9 +200,19 @@ def annotated_expected_df():
     )
 
 
-class TestAggregateModifiedSequenceGroups:
+class TestAddModifiedSequenceGroups:
     def test_aggregate_modified_sequence_groups(
         self, modified_sequence_df: pd.DataFrame, annotated_expected_df: pd.DataFrame
+    ):
+        annotated_df = pa.addModifiedSequenceGroups(
+            modified_sequence_df,
+        )
+        pd.testing.assert_frame_equal(annotated_df, annotated_expected_df)
+
+
+class TestAggregateModifiedSequenceGroups:
+    def test_aggregate_modified_sequence_groups(
+        self, modified_sequence_df: pd.DataFrame, aggregated_expected_df: pd.DataFrame
     ):
         annotated_df = pa.aggregateModifiedSequenceGroups(
             modified_sequence_df,
@@ -151,10 +220,10 @@ class TestAggregateModifiedSequenceGroups:
                 modified_sequence_df.columns.str.startswith("Experiment")
             ],
         )
-        pd.testing.assert_frame_equal(annotated_df, annotated_expected_df)
+        pd.testing.assert_frame_equal(annotated_df, aggregated_expected_df)
 
     def test_aggregate_modified_sequence_groups_extra_columns(
-        self, modified_sequence_df: pd.DataFrame, annotated_expected_df: pd.DataFrame
+        self, modified_sequence_df: pd.DataFrame, aggregated_expected_df: pd.DataFrame
     ):
         modified_sequence_df["Gene Names"] = [
             "GeneA",
@@ -173,5 +242,5 @@ class TestAggregateModifiedSequenceGroups:
             ],
             agg_cols={"Gene Names": "first"},
         )
-        annotated_expected_df["Gene Names"] = ["GeneC", "GeneB", "GeneA"]
-        pd.testing.assert_frame_equal(annotated_df, annotated_expected_df)
+        aggregated_expected_df["Gene Names"] = ["GeneC", "GeneB", "GeneA"]
+        pd.testing.assert_frame_equal(annotated_df, aggregated_expected_df)
