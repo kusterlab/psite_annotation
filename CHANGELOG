@@ -1,3 +1,6 @@
+v0.7.2
+- Fix missing export for addModifiedSequenceGroups
+
 v0.7.1
 - Add support for modified sequence grouping without aggregating
 
