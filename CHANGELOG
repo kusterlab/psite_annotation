@@ -1,3 +1,6 @@
+v0.7.1
+- Add support for modified sequence grouping without aggregating
+
 v0.7.0
 - Add support for modified sequence grouping and aggregating
 - Fix SyntaxWarning in docstrings
