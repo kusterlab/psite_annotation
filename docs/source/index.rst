@@ -14,6 +14,7 @@ Python module for annotating a pandas dataframe with phosphosites, e.g. PhosphoS
 
    installation
    usage
+   development
    Annotator functions <_autosummary/psite_annotation>
    Annotator classes <_autosummary/psite_annotation.annotators>
 
