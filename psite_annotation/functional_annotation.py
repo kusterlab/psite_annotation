@@ -30,6 +30,7 @@ __all__ = [
     "addInVitroKinases",
     "addTurnoverRates",
     "addKinaseLibraryAnnotations",
+    "addModifiedSequenceGroups",
     "aggregateModifiedSequenceGroups",
 ]
 
